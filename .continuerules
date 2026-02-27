@@ -1,0 +1,1233 @@
+# PromptLab Continue Rules
+
+This file defines coding standards, conventions, and best practices for the PromptLab project.
+Continue (AI coding assistant) and all developers should follow these guidelines.
+
+---
+
+## 1. Project Overview
+
+**Project**: PromptLab - Professional Prompt Management Platform  
+**Language**: Python (Backend) + JavaScript/React (Frontend)  
+**Framework**: FastAPI (Backend) + React + Vite (Frontend)  
+**Target**: Full-stack E2E project across 4 weeks
+
+---
+
+## 2. General Coding Standards
+
+### 2.1 Code Style & Formatting
+
+#### Python Backend
+
+- **Style Guide**: PEP 8 (Python Enhancement Proposal 8)
+- **Line Length**: Maximum 100 characters
+- **Indentation**: 4 spaces (never tabs)
+- **Imports**: 
+  - Group in order: standard library, third-party, local
+  - One import per line (except `from x import a, b`)
+  - Alphabetical order within groups
+  
+  ```python
+  # Correct
+  import os
+  import sys
+  from datetime import datetime
+  from typing import List, Optional
+  
+  import requests
+  from fastapi import FastAPI
+  
+  from app.models import Prompt
+  from app.storage import Storage
+  ```
+
+- **Naming Conventions**:
+  - `snake_case` for variables, functions, files: `get_prompt()`, `prompt_data`
+  - `PascalCase` for classes: `PromptStorage`, `HealthResponse`
+  - `SCREAMING_SNAKE_CASE` for constants: `DEFAULT_TIMEOUT`, `MAX_CONTENT_LENGTH`
+  - Private functions: prefix with `_`: `_validate_content()`
+
+- **Blank Lines**:
+  - 2 blank lines between top-level definitions
+  - 1 blank line between method definitions
+  - Use blank lines sparingly inside functions (group logical sections)
+
+#### JavaScript/React Frontend
+
+- **Style Guide**: Airbnb JavaScript Style Guide
+- **Line Length**: Maximum 100 characters
+- **Indentation**: 2 spaces
+- **Semicolons**: Required at end of statements
+- **Quotes**: Double quotes for strings, backticks for template literals
+- **Naming Conventions**:
+  - `camelCase` for variables, functions: `getPrompt()`, `promptData`
+  - `PascalCase` for React components: `<PromptList />`, `<PromptForm />`
+  - `SCREAMING_SNAKE_CASE` for constants: `DEFAULT_API_URL`, `MAX_RETRIES`
+  - Filename = component name (e.g., `PromptList.jsx`)
+
+### 2.2 Comments & Documentation
+
+#### Python
+
+- **Docstrings**: Google-style docstrings for ALL public functions/classes/modules
+  
+  ```python
+  def get_prompt(prompt_id: str) -> Optional[Prompt]:
+      """Retrieve a prompt by its unique identifier.
+      
+      Args:
+          prompt_id: The unique identifier of the prompt.
+          
+      Returns:
+          The Prompt object if found, None otherwise.
+          
+      Raises:
+          ValueError: If prompt_id is empty.
+          
+      Example:
+          >>> prompt = get_prompt("abc123")
+          >>> print(prompt.title)
+      """
+  ```
+
+- **Inline Comments**: Use sparingly; code should be self-documenting
+  
+  ```python
+  # Don't do this (obvious)
+  x = x + 1  # Increment x
+  
+  # Do this (explains why)
+  user_count += 1  # Account for the admin user in calculations
+  ```
+
+#### JavaScript/React
+
+- **JSDoc**: Use JSDoc style for component documentation
+  
+  ```javascript
+  /**
+   * Displays a list of prompts with filtering and sorting options.
+   * 
+   * @param {Prompt[]} prompts - Array of prompt objects
+   * @param {string} [filterCollection] - Optional collection ID to filter by
+   * @returns {JSX.Element} Rendered prompt list component
+   */
+  export function PromptList({ prompts, filterCollection }) {
+    // Implementation
+  }
+  ```
+
+- **Comments**: Explain complex logic, not obvious code
+  
+  ```javascript
+  // Don't do this
+  const x = Math.max(a, b);  // Get the maximum
+  
+  // Do this
+  // Sort by timestamp first, then by ID to ensure stable sort
+  const sorted = items.sort((a, b) => a.created_at - b.created_at);
+  ```
+
+---
+
+## 3. File Naming Conventions
+
+### 3.1 Python Files
+
+```
+backend/
+├── main.py                    # Application entry point
+├── requirements.txt           # Dependencies
+├── app/
+│   ├── __init__.py           # Package marker
+│   ├── models.py             # Pydantic models
+│   ├── api.py                # FastAPI routes
+│   ├── storage.py            # Data storage layer
+│   ├── utils.py              # Utility functions
+│   └── services/             # Business logic (future)
+│       ├── __init__.py
+│       └── prompt_service.py # Descriptive service names
+└── tests/
+    ├── conftest.py           # Pytest fixtures
+    ├── test_api.py           # Test file matches module name
+    ├── test_models.py
+    ├── test_storage.py
+    └── test_utils.py
+```
+
+**Rules**:
+- Filename = `snake_case`
+- Test file = `test_<module_name>.py`
+- No uppercase letters in filenames
+- Descriptive, single-purpose files
+
+### 3.2 JavaScript/React Files
+
+```
+frontend/
+├── src/
+│   ├── api/
+│   │   ├── client.js         # HTTP client
+│   │   ├── prompts.js        # Prompt API calls
+│   │   └── collections.js    # Collection API calls
+│   ├── components/
+│   │   ├── PromptList.jsx    # PascalCase = React component
+│   │   ├── PromptForm.jsx
+│   │   ├── PromptCard.jsx
+│   │   └── common/           # Shared components
+│   │       ├── Header.jsx
+│   │       ├── Button.jsx
+│   │       └── Modal.jsx
+│   ├── pages/
+│   │   ├── PromptPage.jsx
+│   │   └── CollectionsPage.jsx
+│   ├── hooks/
+│   │   ├── usePrompts.js     # Custom hook
+│   │   ├── useCollections.js
+│   │   └── useFetch.js
+│   ├── utils/
+│   │   ├── api.js            # API utilities
+│   │   ├── format.js         # Formatting utilities
+│   │   └── validation.js
+│   ├── App.jsx
+│   └── main.jsx
+├── public/
+├── package.json
+└── vite.config.js
+```
+
+**Rules**:
+- React Components: `PascalCase.jsx`
+- Utilities/Hooks: `camelCase.js`
+- One component per file
+- Related files in folders
+- `index.jsx` for folder exports (optional)
+
+### 3.3 Documentation Files
+
+```
+docs/
+├── API_REFERENCE.md          # Complete API documentation
+├── INSTALLATION.md           # Setup instructions
+├── CONTRIBUTING.md           # Contribution guidelines
+├── DEVELOPMENT.md            # Dev environment guide
+└── specs/
+    ├── prompt-versions.md    # Feature specification
+    └── tagging-system.md
+```
+
+---
+
+## 4. Project Structure Conventions
+
+### 4.1 Backend Structure
+
+```python
+# app/api.py - Route organization
+@router = APIRouter(prefix="/prompts", tags=["Prompts"])
+
+@router.get("/", summary="List Prompts")
+def list_prompts(): pass
+
+@router.get("/{id}", summary="Get Single Prompt")
+def get_prompt(id: str): pass
+
+@router.post("/", summary="Create Prompt", status_code=201)
+def create_prompt(): pass
+
+@router.put("/{id}", summary="Update Prompt")
+def update_prompt(id: str): pass
+
+@router.patch("/{id}", summary="Partial Update")
+def partial_update_prompt(id: str): pass
+
+@router.delete("/{id}", summary="Delete Prompt", status_code=204)
+def delete_prompt(id: str): pass
+```
+
+**Routes Organization**:
+- Group related routes with APIRouter
+- Use `GET`, `POST`, `PUT`, `PATCH`, `DELETE` appropriately
+- Always include `summary` parameter
+- Correct status codes: 200, 201, 204, 400, 404, 409
+- Alphabetical endpoint ordering within group
+
+### 4.2 Frontend Component Structure
+
+```javascript
+// PromptList.jsx - Standard component structure
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';  // Add if using PropTypes
+import { getPrompts } from '../api/prompts';
+import Button from './common/Button';
+import './PromptList.css';  // Scoped styles
+
+/**
+ * Displays a list of all prompts with filtering options.
+ * @returns {JSX.Element}
+ */
+export function PromptList() {
+  const [prompts, setPrompts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchPrompts();
+  }, []);
+
+  const fetchPrompts = async () => {
+    setLoading(true);
+    try {
+      const data = await getPrompts();
+      setPrompts(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div className="prompt-list">
+      {prompts.map(prompt => (
+        <PromptCard key={prompt.id} prompt={prompt} />
+      ))}
+    </div>
+  );
+}
+
+// PropTypes (optional but recommended)
+PromptList.propTypes = {
+  onSelect: PropTypes.func,
+};
+
+// Default props
+PromptList.defaultProps = {
+  onSelect: null,
+};
+```
+
+**React Component Best Practices**:
+- Hooks at the top (useState, useEffect, custom hooks)
+- Event handlers defined in the component
+- Export at the end for easier navigation
+- Separate styling (CSS Modules or styled-components)
+- PropTypes or TypeScript for prop validation
+
+---
+
+## 5. Error Handling Approach
+
+### 5.1 Python Error Handling
+
+#### Custom Exceptions
+
+```python
+# app/exceptions.py
+class PromptLabException(Exception):
+    """Base exception for PromptLab."""
+    pass
+
+class PromptNotFound(PromptLabException):
+    """Raised when a prompt is not found."""
+    pass
+
+class InvalidPromptContent(PromptLabException):
+    """Raised when prompt content is invalid."""
+    pass
+
+class CollectionNotEmpty(PromptLabException):
+    """Raised when attempting to delete non-empty collection."""
+    pass
+```
+
+#### Error Handling Pattern
+
+```python
+from fastapi import FastAPI, HTTPException
+from app.exceptions import PromptNotFound, InvalidPromptContent
+
+@app.get("/prompts/{prompt_id}", response_model=Prompt)
+def get_prompt(prompt_id: str) -> Prompt:
+    """Retrieve a prompt by ID."""
+    try:
+        prompt = storage.get_prompt(prompt_id)
+        if not prompt:
+            raise PromptNotFound(f"Prompt {prompt_id} not found")
+        return prompt
+    except PromptNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        # Log error
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/prompts", response_model=Prompt, status_code=201)
+def create_prompt(prompt_create: PromptCreate) -> Prompt:
+    """Create a new prompt."""
+    try:
+        if not validate_prompt_content(prompt_create.content):
+            raise InvalidPromptContent("Content must be at least 10 characters")
+        return storage.create_prompt(prompt_create)
+    except InvalidPromptContent as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
+```
+
+**Error Handling Rules**:
+- Catch specific exceptions, never bare `except`
+- Map application errors to HTTP status codes:
+  - 400: Bad request validation
+  - 404: Resource not found
+  - 409: Conflict (e.g., collection not empty)
+  - 500: Server error
+- Return meaningful error messages in `detail` field
+- Always log errors (implement logging in Week 3)
+- Never expose internal implementation details to users
+
+### 5.2 JavaScript/React Error Handling
+
+#### API Error Wrapper
+
+```javascript
+// src/api/client.js
+export class ApiError extends Error {
+  constructor(status, detail) {
+    super(detail);
+    this.status = status;
+    this.detail = detail;
+  }
+}
+
+export async function fetchWithErrorHandling(url, options = {}) {
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new ApiError(response.status, data.detail || 'Unknown error');
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(500, error.message);
+  }
+}
+```
+
+#### Component Error Handling
+
+```javascript
+export function PromptList() {
+  const [error, setError] = useState(null);
+
+  const handleFetchError = (err) => {
+    if (err instanceof ApiError) {
+      if (err.status === 404) {
+        setError('Prompt not found');
+      } else if (err.status === 400) {
+        setError('Invalid request');
+      } else {
+        setError('Server error - please try again');
+      }
+    } else {
+      setError('Network error');
+    }
+  };
+
+  const fetchPrompts = async () => {
+    try {
+      const data = await getPrompts();
+      setPrompts(data);
+    } catch (err) {
+      handleFetchError(err);
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="error-alert">
+        <span>{error}</span>
+        <button onClick={fetchPrompts}>Retry</button>
+      </div>
+    );
+  }
+
+  return <PromptListContent prompts={prompts} />;
+}
+```
+
+**Error Handling Rules**:
+- Create custom error classes for different scenarios
+- Handle API errors separately from network errors
+- Show user-friendly error messages
+- Provide retry options when appropriate
+- Log errors for debugging (avoid in production alerts)
+- Never expose API details to users
+
+---
+
+## 6. Testing Requirements
+
+### 6.1 Python Testing (pytest)
+
+#### Test File Structure
+
+```python
+# backend/tests/test_api.py
+import pytest
+from fastapi.testclient import TestClient
+from app.api import app
+from app.models import PromptCreate, CollectionCreate
+
+client = TestClient(app)
+
+class TestHealthCheck:
+    """Tests for health check endpoint."""
+    
+    def test_health_check_returns_healthy(self):
+        """Health check should return healthy status."""
+        response = client.get("/health")
+        assert response.status_code == 200
+        assert response.json()["status"] == "healthy"
+
+class TestPrompts:
+    """Tests for prompt endpoints."""
+    
+    def test_create_prompt_success(self):
+        """Creating a valid prompt should succeed."""
+        response = client.post(
+            "/prompts",
+            json={
+                "title": "Test",
+                "content": "This is a test prompt with enough content",
+            }
+        )
+        assert response.status_code == 201
+        assert response.json()["title"] == "Test"
+    
+    def test_create_prompt_invalid_content(self):
+        """Creating prompt with short content should fail."""
+        response = client.post(
+            "/prompts",
+            json={"title": "Test", "content": "short"}
+        )
+        assert response.status_code == 400
+        assert "least 10 characters" in response.json()["detail"]
+    
+    def test_get_prompt_not_found(self):
+        """Getting non-existent prompt should return 404."""
+        response = client.get("/prompts/invalid_id")
+        assert response.status_code == 404
+        assert "not found" in response.json()["detail"]
+```
+
+**Testing Rules**:
+- Test file = `test_<module>.py`
+- One test class per main feature
+- Test method = `test_<scenario>_<expected>`
+- Use descriptive docstrings
+- One assertion per test (or closely related)
+- Use fixtures for shared setup
+- Aim for 80%+ coverage
+
+#### Test Organization
+
+```python
+# backend/tests/conftest.py - Shared fixtures
+import pytest
+from fastapi.testclient import TestClient
+from app.api import app, storage
+from app.models import PromptCreate, CollectionCreate
+
+@pytest.fixture
+def client():
+    """Provide test client."""
+    return TestClient(app)
+
+@pytest.fixture
+def sample_collection():
+    """Create sample collection for tests."""
+    col_data = CollectionCreate(
+        name="Test Collection",
+        description="For testing"
+    )
+    return storage.create_collection(col_data)
+
+@pytest.fixture
+def sample_prompt(sample_collection):
+    """Create sample prompt for tests."""
+    prompt_data = PromptCreate(
+        title="Test Prompt",
+        content="This is a test prompt with enough content",
+        collection_id=sample_collection.id
+    )
+    return storage.create_prompt(prompt_data)
+
+@pytest.fixture(autouse=True)
+def clear_storage():
+    """Clear storage before each test."""
+    storage.clear()
+    yield
+    storage.clear()
+```
+
+**Test Coverage Targets**:
+- Week 1: Basic CRUD tests (40%)
+- Week 2: Expanded error cases (60%)
+- Week 3: All edge cases (80%+)
+
+### 6.2 JavaScript/React Testing (Jest + React Testing Library)
+
+#### Component Test Structure
+
+```javascript
+// src/components/__tests__/PromptList.test.jsx
+import { render, screen, waitFor } from '@testing-library/react';
+import { PromptList } from '../PromptList';
+import * as promptsApi from '../../api/prompts';
+
+jest.mock('../../api/prompts');
+
+describe('PromptList', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('renders loading state initially', () => {
+    promptsApi.getPrompts.mockImplementation(() => new Promise(() => {}));
+    render(<PromptList />);
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+  });
+
+  test('renders prompts after loading', async () => {
+    const mockPrompts = [
+      { id: '1', title: 'Test 1', content: 'Content 1' },
+      { id: '2', title: 'Test 2', content: 'Content 2' },
+    ];
+    promptsApi.getPrompts.mockResolvedValue(mockPrompts);
+
+    render(<PromptList />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Test 1')).toBeInTheDocument();
+      expect(screen.getByText('Test 2')).toBeInTheDocument();
+    });
+  });
+
+  test('handles error state', async () => {
+    promptsApi.getPrompts.mockRejectedValue(new Error('API Error'));
+    render(<PromptList />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/error/i)).toBeInTheDocument();
+    });
+  });
+});
+```
+
+**Testing Rules**:
+- Use React Testing Library (test behavior, not implementation)
+- Mock API calls
+- Test user interactions (clicks, input)
+- Test error states
+- Use descriptive test names
+- One feature per test
+- Use `beforeEach` for setup
+
+#### Test Configuration
+
+```javascript
+// jest.config.js
+export default {
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  },
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx}',
+    '!src/main.jsx',
+    '!src/**/*.test.{js,jsx}',
+  ],
+};
+```
+
+### 6.3 Test Execution
+
+#### Python
+
+```bash
+# Run all tests
+pytest tests/ -v
+
+# Run with coverage
+pytest tests/ --cov=app --cov-report=html
+
+# Run specific test file
+pytest tests/test_api.py -v
+
+# Run specific test
+pytest tests/test_api.py::TestPrompts::test_create_prompt_success -v
+```
+
+#### JavaScript
+
+```bash
+# Run all tests
+npm test
+
+# Run with coverage
+npm test -- --coverage
+
+# Run specific file
+npm test -- PromptList.test.jsx
+
+# Watch mode
+npm test -- --watch
+```
+
+---
+
+## 7. Type Safety
+
+### 7.1 Python Type Hints
+
+**Always use type hints** in Python:
+
+```python
+from typing import List, Optional, Dict, Union
+
+# Function arguments and return types
+def get_prompts(
+    collection_id: Optional[str] = None,
+    search: Optional[str] = None
+) -> List[Prompt]:
+    """Get filtered prompts."""
+    pass
+
+# Class attributes
+class Storage:
+    prompts: Dict[str, Prompt] = {}
+    
+    def create_prompt(self, data: PromptCreate) -> Prompt:
+        pass
+
+# Optional types (can be None)
+def get_optional(id: str) -> Optional[Prompt]:
+    pass
+
+# Union types (multiple possible types)
+def process(data: Union[str, int]) -> bool:
+    pass
+```
+
+**Type Hint Rules**:
+- All function parameters and returns
+- All class attributes
+- Use `Optional[T]` instead of `T | None` (for Python 3.9 compatibility)
+- Use specific types, not generic `Any`
+
+### 7.2 JavaScript/React Type Hints (JSDoc)
+
+```javascript
+/**
+ * @param {Prompt[]} prompts
+ * @param {string} [collectionId]
+ * @returns {JSX.Element}
+ */
+export function PromptList({ prompts, collectionId }) {
+  // Implementation
+}
+
+/**
+ * @typedef {Object} Prompt
+ * @property {string} id
+ * @property {string} title
+ * @property {string} content
+ * @property {string} [description]
+ */
+```
+
+**Alternative: TypeScript** (if adopting in future)
+```typescript
+interface Prompt {
+  id: string;
+  title: string;
+  content: string;
+  description?: string;
+}
+
+function getPrompt(id: string): Promise<Prompt> {
+  // Implementation
+}
+```
+
+---
+
+## 8. Performance Considerations
+
+### 8.1 Backend Performance
+
+```python
+# Avoid N+1 queries (use batch operations)
+# Bad: Loop queries
+for prompt_id in prompt_ids:
+    prompt = storage.get_prompt(prompt_id)  # Multiple queries
+
+# Good: Batch operation
+prompts = [storage.get_prompt(id) for id in prompt_ids]
+
+# Efficient filtering
+# Bad: Filter in Python after fetching all
+all_prompts = storage.get_all_prompts()
+filtered = [p for p in all_prompts if p.collection_id == col_id]
+
+# Good: Filter in storage/database layer
+filtered = storage.get_prompts_by_collection(col_id)
+
+# Cache frequently accessed data
+# Future: Implement Redis/memcache for Week 3+
+```
+
+### 8.2 Frontend Performance
+
+```javascript
+// Use useMemo for expensive calculations
+const expensiveList = useMemo(
+  () => prompts.filter(p => p.collection === filter),
+  [prompts, filter]
+);
+
+// Use useCallback for stable event handlers
+const handleDelete = useCallback(
+  (id) => deletePrompt(id),
+  []
+);
+
+// Lazy load images and components
+const HeavyComponent = React.lazy(() => import('./Heavy'));
+
+// Use key prop correctly in lists
+{prompts.map(prompt => (
+  <PromptCard key={prompt.id} prompt={prompt} />
+))}
+```
+
+---
+
+## 9. Git & Version Control
+
+### 9.1 Commit Messages
+
+**Format**: `<type>(<scope>): <subject>`
+
+```
+feat(api): Add PATCH endpoint for prompts
+fix(storage): Fix timestamp update on prompt modification
+docs(api): Add request examples to API reference
+style(models): Format type hints consistently
+test(api): Add 5 new test cases for error scenarios
+refactor(storage): Extract validation logic to utils
+```
+
+**Types**:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `style`: Code style (no functional change)
+- `test`: Test additions/fixes
+- `refactor`: Code restructuring
+- `perf`: Performance improvement
+
+**Scope**: Area of change (api, storage, models, utils, etc.)
+
+**Subject**: 
+- Lowercase
+- Imperative mood ("add" not "added")
+- No period at end
+- Max 50 characters
+
+### 9.2 Branch Naming
+
+```
+feature/add-tagging-system
+fix/collection-deletion-bug
+docs/api-reference
+refactor/storage-layer
+```
+
+### 9.3 Pull Request Checklist
+
+```markdown
+## Before Merging
+
+- [ ] Tests pass locally (`pytest` or `npm test`)
+- [ ] Coverage maintained or improved
+- [ ] No linting errors
+- [ ] Docstrings/comments added
+- [ ] No debug code or console.logs
+- [ ] Updated related documentation
+- [ ] Meaningful commit messages
+```
+
+---
+
+## 10. Code Review Standards
+
+### 10.1 What to Check
+
+#### Python
+```python
+# ✅ DO
+def validate_and_store(data: PromptCreate) -> Prompt:
+    """Validate and store prompt, returning created object."""
+    if not validate_prompt_content(data.content):
+        raise InvalidPromptContent("Content too short")
+    return storage.create_prompt(data)
+
+# ❌ DON'T
+def validate_and_store(data):
+    # No type hints
+    # Validation logic unclear
+    if len(data["content"]) < 10:
+        return False
+    return True
+```
+
+#### JavaScript
+```javascript
+// ✅ DO
+function fetchAndRender() {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    getPrompts()
+      .then(setData)
+      .catch(setError);
+  }, []);
+  
+  return error ? <Error /> : <List data={data} />;
+}
+
+// ❌ DON'T
+function fetchAndRender() {
+  const data = getPrompts(); // Synchronous call
+  return <List data={data} />; // Missing error handling
+}
+```
+
+### 10.2 Code Review Feedback
+
+- Be respectful and constructive
+- Suggest improvements, don't demand
+- Provide examples for clarity
+- Acknowledge uncertainty: "I'm not sure, but maybe...?"
+- Approve once concerns resolved
+
+---
+
+## 11. Development Workflow
+
+### 11.1 Local Development
+
+```bash
+# Backend setup
+cd backend
+python3 -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+pip install -r requirements.txt
+python main.py  # Runs on http://localhost:8000
+
+# Frontend setup (Week 4)
+cd frontend
+npm install
+npm run dev  # Runs on http://localhost:5173
+```
+
+### 11.2 Testing Before Commit
+
+```bash
+# Backend
+pytest tests/ -v --cov=app
+
+# Frontend (when available)
+npm test -- --coverage
+
+# Linting
+pylint app/  # Python (optional in Week 1)
+eslint src/  # JavaScript (optional in Week 1)
+```
+
+---
+
+## 12. Documentation Standards
+
+### 12.1 Docstring Coverage
+
+**Required for**:
+- All public functions
+- All classes
+- All modules
+- Complex algorithms or logic
+
+**Not required for**:
+- Simple getters/setters
+- Obvious implementations
+- Private helper functions (unless complex)
+
+### 12.2 README Requirements
+
+Each directory should have relevant documentation:
+- `backend/README.md` - Backend setup and structure
+- `frontend/README.md` - Frontend setup (Week 4)
+- `docs/` - Comprehensive guides
+
+---
+
+## 13. Security Best Practices
+
+### 13.1 Input Validation
+
+```python
+# Always validate user input
+def create_prompt(prompt_data: PromptCreate) -> Prompt:
+    # Pydantic validates schema
+    # Validate content length
+    if not validate_prompt_content(prompt_data.content):
+        raise InvalidPromptContent("Content too short")
+    # Sanitize if needed
+    title = sanitize_string(prompt_data.title)
+    return storage.create_prompt(prompt_data)
+```
+
+### 13.2 No Secrets in Code
+
+```python
+# ❌ DON'T
+DATABASE_URL = "postgresql://user:password@localhost/db"
+API_KEY = "sk_live_1234567890"
+
+# ✅ DO
+import os
+DATABASE_URL = os.getenv("DATABASE_URL")
+API_KEY = os.getenv("API_KEY")
+```
+
+### 13.3 CORS Configuration
+
+```python
+# Current (development): Allow all
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+)
+
+# Production (implement in Week 3)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://promptlab.example.com",
+        "https://app.promptlab.example.com",
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allow_headers=["Content-Type"],
+)
+```
+
+---
+
+## 14. Debugging & Logging
+
+### 14.1 Debugging Approach
+
+```python
+# Use logging, not print
+import logging
+
+logger = logging.getLogger(__name__)
+
+def get_prompt(prompt_id: str) -> Optional[Prompt]:
+    logger.debug(f"Fetching prompt: {prompt_id}")
+    prompt = storage.get_prompt(prompt_id)
+    if not prompt:
+        logger.warning(f"Prompt not found: {prompt_id}")
+    return prompt
+```
+
+### 14.2 Debugging Tools
+
+**Python**:
+- `pdb` - Python debugger (`import pdb; pdb.set_trace()`)
+- `pytest` - Built-in debugging (`pytest --pdb`)
+- `logging` - Structured logging
+
+**JavaScript**:
+- Browser DevTools
+- `console.log()` (sparingly)
+- VS Code debugger
+- React DevTools extension
+
+---
+
+## 15. Linting & Formatting
+
+### 15.1 Python Linting (Optional for Week 1)
+
+```bash
+# Install
+pip install pylint black flake8
+
+# Check
+pylint app/
+flake8 app/
+
+# Format
+black app/
+```
+
+### 15.2 JavaScript Linting
+
+```bash
+# Install
+npm install --save-dev eslint eslint-config-airbnb
+
+# Check
+eslint src/
+
+# Auto-fix
+eslint src/ --fix
+```
+
+---
+
+## 16. AI Coding Assistant Instructions
+
+When using Continue or other AI assistants:
+
+### 16.1 Always
+
+- Maintain Google-style docstrings
+- Follow PEP 8 (Python) / Airbnb (JavaScript)
+- Include type hints
+- Write testable code
+- Handle errors explicitly
+- Use meaningful variable names
+
+### 16.2 Never
+
+- Skip error handling
+- Write code without docstrings
+- Use `Any` types
+- Commit debug code
+- Create god functions (>100 lines)
+- Ignore existing patterns
+
+### 16.3 Code Generation Prompt Template
+
+```
+Create [description] following these rules:
+- Python/JavaScript style guide: [reference this file]
+- Docstring format: Google-style
+- Error handling: Specific exception types, HTTP status codes
+- Testing: Include test cases
+- File: [location and naming convention]
+```
+
+---
+
+## 17. Checklists
+
+### 17.1 Before Submitting Code
+
+- [ ] Code follows naming conventions
+- [ ] Type hints on all functions
+- [ ] Google-style docstrings added
+- [ ] Tests written and passing
+- [ ] Error handling implemented
+- [ ] No `print()` statements (use logging)
+- [ ] No hardcoded credentials
+- [ ] Imports properly organized
+- [ ] Line length ≤ 100 characters
+- [ ] No linting errors
+
+### 17.2 Before Merging PR
+
+- [ ] All tests pass
+- [ ] Coverage maintained/improved
+- [ ] Code review approved
+- [ ] Documentation updated
+- [ ] Commit messages clear
+- [ ] No merge conflicts
+- [ ] All feedback addressed
+
+---
+
+## 18. Quick Reference
+
+### Common Commands
+
+```bash
+# Python
+python main.py                 # Run backend
+pytest tests/ -v               # Run tests
+pytest tests/ --cov=app        # Coverage report
+
+# JavaScript
+npm run dev                     # Dev server
+npm test                        # Run tests
+npm run build                   # Build for production
+
+# Git
+git checkout -b feature/name    # Create feature branch
+git commit -m "type(scope): msg" # Proper commit message
+git push origin feature/name    # Push to remote
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `backend/requirements.txt` | Python dependencies |
+| `backend/app/api.py` | API endpoints |
+| `backend/app/models.py` | Data models |
+| `backend/app/storage.py` | Data storage |
+| `backend/tests/` | Test suite |
+| `docs/API_REFERENCE.md` | API documentation |
+| `.continuerules` | This file! |
+
+---
+
+## 19. Changes & Updates
+
+**Last Updated**: February 27, 2026  
+**Version**: 1.0.0
+
+To update this file:
+1. Follow the same format
+2. Keep sections organized
+3. Add version history below
+
+### Version History
+- **1.0.0** (Feb 27, 2026) - Initial comprehensive rules document
+
+---
+
+**Remember**: These rules exist to maintain code quality, consistency, and team productivity.  
+When in doubt, prioritize **clarity** and **maintainability** over cleverness. 💡

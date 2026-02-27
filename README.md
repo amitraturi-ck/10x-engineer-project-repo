@@ -4,164 +4,120 @@
 
 ---
 
-## Welcome to the Team! 👋
+## Project Overview
 
-Congratulations on joining the PromptLab engineering team! You've been brought on to help us build the next generation of prompt engineering tools.
+PromptLab is a cutting-edge platform designed for AI engineers to handle and refine AI prompts. It's akin to a "Postman for Prompts," offering a suite of tools for managing, organizing, and optimizing AI prompts effectively. This platform aims to streamline the workflow of AI developers by providing an intuitive environment for prompt engineering needs.
 
-### What is PromptLab?
+### Purpose
 
-PromptLab is an internal tool for AI engineers to **store, organize, and manage their prompts**. Think of it as a "Postman for Prompts" — a professional workspace where teams can:
-
-- 📝 Store prompt templates with variables (`{{input}}`, `{{context}}`)
-- 📁 Organize prompts into collections
-- 🏷️ Tag and search prompts
-- 📜 Track version history
-- 🧪 Test prompts with sample inputs
-
-### The Current Situation
-
-The previous developer left us with a *partially working* backend. The core structure is there, but:
-
-- There are **several bugs** that need fixing
-- Some **features are incomplete**
-- The **documentation is minimal** (you'll fix that)
-- There are **no tests** worth mentioning
-- **No CI/CD pipeline** exists
-- **No frontend** has been built yet
-
-Your job over the next 4 weeks is to transform this into a **production-ready, full-stack application**.
+The primary purpose of PromptLab is to centralize the storage of prompt templates, enable efficient organization into collections, facilitate seamless searching and tagging, and allow version tracking, all while being integrated into a robust development and deployment ecosystem.
 
 ---
 
-## Quick Start
+## Features List
+
+- **Prompt Management**: Store and manage prompt templates with dynamic variables.
+- **Collections**: Organize prompts into cohesive collections.
+- **Tagging and Searching**: Efficiently tag and search prompts within your workspace.
+- **Version History**: Track changes and version history for each prompt.
+- **API Access**: Expose a RESTful API for prompt operations.
+- **CI/CD Integration**: Streamline deployment cycles (future development).
+- **User Authentication**: Secure access to prompt data (future development).
+
+---
+
+## Prerequisites and Installation
 
 ### Prerequisites
 
 - Python 3.10+
-- Node.js 18+ (for Week 4)
+- Node.js 18+
 - Git
 
-### Run Locally
+### Installation
 
 ```bash
-# Clone the repo
+# Clone the repository
 git clone <your-repo-url>
 cd promptlab
 
 # Set up backend
 cd backend
 pip install -r requirements.txt
-python main.py
 ```
 
-API runs at: http://localhost:8000
+---
 
-API docs at: http://localhost:8000/docs
+## Quick Start Guide
 
-### Run Tests
+To get started with PromptLab on your local machine:
 
+1. **Run the Backend**:
+   ```bash
+   cd backend
+   python main.py
+   ```
+   Your API will be live at [http://localhost:8000](http://localhost:8000)
+
+2. **Access API Documentation**:
+   Visit [http://localhost:8000/docs](http://localhost:8000/docs) for Swagger UI interactive documentation.
+
+3. **Run Tests**:
+   ```bash
+   cd backend
+   pytest tests/ -v
+   ```
+
+---
+
+## API Endpoint Summary
+
+| Method | Endpoint          | Description         |
+|--------|-------------------|---------------------|
+| GET    | `/health`         | Health check        |
+| GET    | `/prompts`        | List all prompts    |
+| GET    | `/prompts/{id}`   | Get single prompt   |
+| POST   | `/prompts`        | Create prompt       |
+| PUT    | `/prompts/{id}`   | Update prompt       |
+| DELETE | `/prompts/{id}`   | Delete prompt       |
+| GET    | `/collections`    | List collections    |
+| POST   | `/collections`    | Create collection   |
+| DELETE | `/collections/{id}` | Delete collection |
+
+### Example: Fetch All Prompts
 ```bash
-cd backend
-pytest tests/ -v
+curl -X GET "http://localhost:8000/prompts" -H "accept: application/json"
 ```
 
 ---
 
-## Project Structure
+## Development Setup
 
-```
-promptlab/
-├── README.md                    # You are here
-├── PROJECT_BRIEF.md             # Your assignment details
-├── GRADING_RUBRIC.md            # How you'll be graded
-│
-├── backend/
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── api.py              # FastAPI routes (has bugs!)
-│   │   ├── models.py           # Pydantic models
-│   │   ├── storage.py          # In-memory storage
-│   │   └── utils.py            # Helper functions
-│   ├── tests/
-│   │   ├── __init__.py
-│   │   ├── test_api.py         # Basic tests
-│   │   └── conftest.py         # Test fixtures
-│   ├── main.py                 # Entry point
-│   └── requirements.txt
-│
-├── frontend/                    # You'll create this in Week 4
-├── specs/                       # You'll create this in Week 2
-├── docs/                        # You'll create this in Week 2
-└── .github/                     # You'll set up CI/CD in Week 3
-```
+1. **Backend**:
+   - Code is structured under `backend/app/` with FastAPI managing API routes and Pydantic for data validation.
+   - Ensure Python dependencies are managed with `requirements.txt`.
+
+2. **Frontend**:
+   - Planned for development using React and Vite in subsequent project phases. 
+
+3. **Testing**:
+   - Run tests using `pytest` to ensure code quality and reliability.
+
+4. **Continuous Integration/Deployment**:
+   - Planned integration with Docker and GitHub Actions for seamless deployment workflows.
 
 ---
 
-## Your Mission
+## Contributing Guidelines
 
-### 🧪 Experimentation Encouraged!
-While we provide guidelines, **you are the engineer**. If you see a better way to solve a problem using AI, do it!
-- Want to swap the storage layer for a real database? **Go for it.**
-- Want to add Authentication? **Do it.**
-- Want to rewrite the API in a different style? **As long as tests pass, you're clear.**
+We're excited to have a community of contributors who desire to build a robust and innovative platform.
 
-The goal is to learn how to build *better* software *faster* with AI. Don't be afraid to break things and rebuild them better.
+1. **Fork the Repository**: Make your own version to work with.
+2. **Create a Feature Branch**: Work on changes in feature-specific branches.
+3. **Commit Changes**: Make and commit your changes with clear and concise messages.
+4. **Push Branch**: Push your feature branch to your fork.
+5. **Submit a Pull Request**: Open a pull request with a descriptive summary of your changes.
 
-### Week 1: Fix the Backend
-- Understand this codebase using AI
-- Find and fix the bugs
-- Implement missing features
+For major changes, please open an issue first to discuss what you would like to change.
 
-### Week 2: Document Everything
-- Write proper documentation
-- Create feature specifications
-- Set up coding standards
 
-### Week 3: Make it Production-Ready
-- Write comprehensive tests
-- Implement new features with TDD
-- Set up CI/CD and Docker
-
-### Week 4: Build the Frontend
-- Create a React frontend
-- Connect it to the backend
-- Polish the user experience
-
----
-
-## API Endpoints (Current)
-
-| Method | Endpoint | Description | Status |
-|--------|----------|-------------|--------|
-| GET | `/health` | Health check | ✅ Works |
-| GET | `/prompts` | List all prompts | ⚠️ Has issues |
-| GET | `/prompts/{id}` | Get single prompt | ❌ Bug |
-| POST | `/prompts` | Create prompt | ✅ Works |
-| PUT | `/prompts/{id}` | Update prompt | ⚠️ Has issues |
-| DELETE | `/prompts/{id}` | Delete prompt | ✅ Works |
-| GET | `/collections` | List collections | ✅ Works |
-| GET | `/collections/{id}` | Get collection | ✅ Works |
-| POST | `/collections` | Create collection | ✅ Works |
-| DELETE | `/collections/{id}` | Delete collection | ❌ Bug |
-
----
-
-## Tech Stack
-
-- **Backend**: Python 3.10+, FastAPI, Pydantic
-- **Frontend**: React, Vite (Week 4)
-- **Testing**: pytest
-- **DevOps**: Docker, GitHub Actions (Week 3)
-
----
-
-## Need Help?
-
-1. **Use AI tools** — This is an AI-assisted coding course!
-2. Read the `PROJECT_BRIEF.md` for detailed instructions
-3. Check `GRADING_RUBRIC.md` to understand expectations
-4. Ask questions in the course forum
-
----
-
-Good luck, and welcome to the team! 🚀
