@@ -54,7 +54,7 @@ Use AI to explore and understand:
 #### Task 1.2: Fix Bug #1 - GET /prompts/{id} Returns 500
 **Problem**: When requesting a prompt that doesn't exist, the API returns a 500 Internal Server Error instead of a 404 Not Found.
 
-**Your job**: 
+**Your job**:
 - [ ] Locate the bug in the code
 - [ ] Fix it to return proper 404 response
 - [ ] Ensure the test passes
@@ -166,16 +166,16 @@ Add Google-style docstrings to every function and class:
 ```python
 def get_prompt(prompt_id: str) -> Optional[Prompt]:
     """Retrieve a prompt by its unique identifier.
-    
+
     Args:
         prompt_id: The unique identifier of the prompt to retrieve.
-        
+
     Returns:
         The Prompt object if found, None otherwise.
-        
+
     Raises:
         ValueError: If prompt_id is empty or invalid format.
-        
+
     Example:
         >>> prompt = get_prompt("abc123")
         >>> print(prompt.title)

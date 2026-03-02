@@ -2,7 +2,7 @@
   "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
   "name": "Assessment B - Inventory API",
 
-  "postCreateCommand": "bash .devcontainer/setup.sh", 
+  "postCreateCommand": "bash .devcontainer/setup.sh",
 
   "remoteEnv": {
       "COURSE_SEMESTER": "SPRING_2025-2026"
@@ -20,10 +20,10 @@
         "editor.tabSize": 4,
         "editor.wordWrap": "on",
         "python.defaultInterpreterPath": "/usr/local/bin/python",
-        
+
         "github.copilot.enable": {
-            "*": false, 
-            "plaintext": false 
+            "*": false,
+            "plaintext": false
         },
         "github.copilot.editor.enableAutoCompletions": false,
         "chat.agent.enabled": false,
@@ -34,7 +34,7 @@
       }
     }
   },
-  
+
   "portsAttributes": {
     "8000": {
       "label": "FastAPI Server",

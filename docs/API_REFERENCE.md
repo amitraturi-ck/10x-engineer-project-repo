@@ -1284,6 +1284,6 @@ For issues or questions:
 
 ---
 
-**Last Updated**: February 27, 2026  
-**API Version**: 1.0.0  
+**Last Updated**: February 27, 2026
+**API Version**: 1.0.0
 **Framework**: FastAPI 0.109.0

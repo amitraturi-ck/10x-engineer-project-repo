@@ -7,9 +7,9 @@ Continue (AI coding assistant) and all developers should follow these guidelines
 
 ## 1. Project Overview
 
-**Project**: PromptLab - Professional Prompt Management Platform  
-**Language**: Python (Backend) + JavaScript/React (Frontend)  
-**Framework**: FastAPI (Backend) + React + Vite (Frontend)  
+**Project**: PromptLab - Professional Prompt Management Platform
+**Language**: Python (Backend) + JavaScript/React (Frontend)
+**Framework**: FastAPI (Backend) + React + Vite (Frontend)
 **Target**: Full-stack E2E project across 4 weeks
 
 ---
@@ -23,21 +23,21 @@ Continue (AI coding assistant) and all developers should follow these guidelines
 - **Style Guide**: PEP 8 (Python Enhancement Proposal 8)
 - **Line Length**: Maximum 100 characters
 - **Indentation**: 4 spaces (never tabs)
-- **Imports**: 
+- **Imports**:
   - Group in order: standard library, third-party, local
   - One import per line (except `from x import a, b`)
   - Alphabetical order within groups
-  
+
   ```python
   # Correct
   import os
   import sys
   from datetime import datetime
   from typing import List, Optional
-  
+
   import requests
   from fastapi import FastAPI
-  
+
   from app.models import Prompt
   from app.storage import Storage
   ```
@@ -71,20 +71,20 @@ Continue (AI coding assistant) and all developers should follow these guidelines
 #### Python
 
 - **Docstrings**: Google-style docstrings for ALL public functions/classes/modules
-  
+
   ```python
   def get_prompt(prompt_id: str) -> Optional[Prompt]:
       """Retrieve a prompt by its unique identifier.
-      
+
       Args:
           prompt_id: The unique identifier of the prompt.
-          
+
       Returns:
           The Prompt object if found, None otherwise.
-          
+
       Raises:
           ValueError: If prompt_id is empty.
-          
+
       Example:
           >>> prompt = get_prompt("abc123")
           >>> print(prompt.title)
@@ -92,11 +92,11 @@ Continue (AI coding assistant) and all developers should follow these guidelines
   ```
 
 - **Inline Comments**: Use sparingly; code should be self-documenting
-  
+
   ```python
   # Don't do this (obvious)
   x = x + 1  # Increment x
-  
+
   # Do this (explains why)
   user_count += 1  # Account for the admin user in calculations
   ```
@@ -104,11 +104,11 @@ Continue (AI coding assistant) and all developers should follow these guidelines
 #### JavaScript/React
 
 - **JSDoc**: Use JSDoc style for component documentation
-  
+
   ```javascript
   /**
    * Displays a list of prompts with filtering and sorting options.
-   * 
+   *
    * @param {Prompt[]} prompts - Array of prompt objects
    * @param {string} [filterCollection] - Optional collection ID to filter by
    * @returns {JSX.Element} Rendered prompt list component
@@ -119,11 +119,11 @@ Continue (AI coding assistant) and all developers should follow these guidelines
   ```
 
 - **Comments**: Explain complex logic, not obvious code
-  
+
   ```javascript
   // Don't do this
   const x = Math.max(a, b);  // Get the maximum
-  
+
   // Do this
   // Sort by timestamp first, then by ID to ensure stable sort
   const sorted = items.sort((a, b) => a.created_at - b.created_at);
@@ -498,7 +498,7 @@ client = TestClient(app)
 
 class TestHealthCheck:
     """Tests for health check endpoint."""
-    
+
     def test_health_check_returns_healthy(self):
         """Health check should return healthy status."""
         response = client.get("/health")
@@ -507,7 +507,7 @@ class TestHealthCheck:
 
 class TestPrompts:
     """Tests for prompt endpoints."""
-    
+
     def test_create_prompt_success(self):
         """Creating a valid prompt should succeed."""
         response = client.post(
@@ -519,7 +519,7 @@ class TestPrompts:
         )
         assert response.status_code == 201
         assert response.json()["title"] == "Test"
-    
+
     def test_create_prompt_invalid_content(self):
         """Creating prompt with short content should fail."""
         response = client.post(
@@ -528,7 +528,7 @@ class TestPrompts:
         )
         assert response.status_code == 400
         assert "least 10 characters" in response.json()["detail"]
-    
+
     def test_get_prompt_not_found(self):
         """Getting non-existent prompt should return 404."""
         response = client.get("/prompts/invalid_id")
@@ -723,7 +723,7 @@ def get_prompts(
 # Class attributes
 class Storage:
     prompts: Dict[str, Prompt] = {}
-    
+
     def create_prompt(self, data: PromptCreate) -> Prompt:
         pass
 
@@ -856,7 +856,7 @@ refactor(storage): Extract validation logic to utils
 
 **Scope**: Area of change (api, storage, models, utils, etc.)
 
-**Subject**: 
+**Subject**:
 - Lowercase
 - Imperative mood ("add" not "added")
 - No period at end
@@ -915,13 +915,13 @@ def validate_and_store(data):
 function fetchAndRender() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  
+
   useEffect(() => {
     getPrompts()
       .then(setData)
       .catch(setError);
   }, []);
-  
+
   return error ? <Error /> : <List data={data} />;
 }
 
@@ -1216,7 +1216,7 @@ git push origin feature/name    # Push to remote
 
 ## 19. Changes & Updates
 
-**Last Updated**: February 27, 2026  
+**Last Updated**: February 27, 2026
 **Version**: 1.0.0
 
 To update this file:
@@ -1229,5 +1229,5 @@ To update this file:
 
 ---
 
-**Remember**: These rules exist to maintain code quality, consistency, and team productivity.  
+**Remember**: These rules exist to maintain code quality, consistency, and team productivity.
 When in doubt, prioritize **clarity** and **maintainability** over cleverness. 💡

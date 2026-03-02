@@ -1,10 +1,10 @@
 # Feature Specification: Prompt Version History & Management
 
-**Document Version**: 1.0  
-**Status**: Ready for Implementation (Week 3)  
-**Last Updated**: February 27, 2026  
-**Priority**: High  
-**Complexity**: Medium  
+**Document Version**: 1.0
+**Status**: Ready for Implementation (Week 3)
+**Last Updated**: February 27, 2026
+**Priority**: High
+**Complexity**: Medium
 
 ---
 
@@ -68,8 +68,8 @@ The Prompt Version History feature enables users to track, compare, and restore 
 
 ### Story 1: View Version History
 
-**As a** prompt creator  
-**I want to** view a complete list of all versions of a prompt  
+**As a** prompt creator
+**I want to** view a complete list of all versions of a prompt
 **So that** I can track how the prompt has evolved over time
 
 #### Acceptance Criteria
@@ -107,8 +107,8 @@ Then matching versions are highlighted
 
 ### Story 2: Compare Two Versions
 
-**As a** prompt creator  
-**I want to** compare two different versions side-by-side  
+**As a** prompt creator
+**I want to** compare two different versions side-by-side
 **So that** I can understand what changed between them
 
 #### Acceptance Criteria
@@ -165,8 +165,8 @@ Description
 
 ### Story 3: Restore a Previous Version
 
-**As a** prompt creator  
-**I want to** restore a prompt to a previous version  
+**As a** prompt creator
+**I want to** restore a prompt to a previous version
 **So that** I can undo unwanted changes
 
 #### Acceptance Criteria
@@ -228,8 +228,8 @@ Then distinct versions are created for each restore
 
 ### Story 4: Automatic Version Creation on Save
 
-**As a** system  
-**I want to** automatically create a version whenever a prompt is modified  
+**As a** system
+**I want to** automatically create a version whenever a prompt is modified
 **So that** all changes are automatically tracked
 
 #### Acceptance Criteria
@@ -271,8 +271,8 @@ Then performance remains acceptable (<100ms lookup)
 
 ### Story 5: Version Metadata & Audit Trail
 
-**As a** system administrator  
-**I want to** track detailed metadata for each version  
+**As a** system administrator
+**I want to** track detailed metadata for each version
 **So that** I can maintain audit compliance and understand change patterns
 
 #### Acceptance Criteria
@@ -321,26 +321,26 @@ CREATE TABLE prompt_versions (
   id TEXT PRIMARY KEY,              -- UUID4
   prompt_id TEXT NOT NULL,          -- Foreign key to prompts
   version_number INTEGER NOT NULL,  -- Sequential: 1, 2, 3...
-  
+
   -- Content Snapshot
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   description TEXT,
   collection_id TEXT,
-  
+
   -- Metadata
   created_at TIMESTAMP NOT NULL,    -- When version was created
   author_id TEXT DEFAULT 'system',  -- User who made change (future)
   change_summary TEXT,              -- Optional user description
-  
+
   -- Integrity & Analysis
   content_hash TEXT,                -- SHA256(content)
   content_size_bytes INTEGER,       -- Size tracking
-  
+
   -- Flags
   is_current BOOLEAN DEFAULT FALSE, -- Only one TRUE per prompt
   is_restored BOOLEAN DEFAULT FALSE,-- Indicates restore operation
-  
+
   -- Uniqueness Constraints
   UNIQUE(prompt_id, version_number),
   FOREIGN KEY(prompt_id) REFERENCES prompts(id) ON DELETE CASCADE,
@@ -388,13 +388,13 @@ class PromptVersion(BaseModel):
     change_summary: Optional[str] = None
     is_current: bool = False
     is_restored: bool = False
-    
+
     # Full Content
     title: str
     content: str
     description: Optional[str] = None
     collection_id: Optional[str] = None
-    
+
     # Integrity
     content_hash: str
     content_size_bytes: int
@@ -415,28 +415,28 @@ class VersionComparison(BaseModel):
     version1_number: int
     version2_id: str
     version2_number: int
-    
+
     # Field diffs
     title_changed: bool
     title_diff: Optional[str] = None
-    
+
     content_changed: bool
     content_diff: Optional[str] = None  # Unified diff format
-    
+
     description_changed: bool
     description_diff: Optional[str] = None
-    
+
     collection_changed: bool
     collection_old: Optional[str] = None
     collection_new: Optional[str] = None
-    
+
     metadata: Dict[str, Any]
 
 
 class VersionRestoreRequest(BaseModel):
     """Request to restore a version."""
     summary: Optional[str] = None  # User-provided context
-    
+
     @validator('summary')
     def summary_length(cls, v):
         if v and len(v) > 500:
@@ -1072,7 +1072,7 @@ SELECT uuid(), id, 1, ... FROM prompts
 -- Step 3: Update prompts table
 ALTER TABLE prompts ADD COLUMN current_version_id
 UPDATE prompts SET current_version_id = (
-  SELECT id FROM prompt_versions 
+  SELECT id FROM prompt_versions
   WHERE prompt_id = prompts.id AND version_number = 1
 )
 
@@ -1098,7 +1098,7 @@ def generate_diff(content_v1: str, content_v2: str) -> str:
     """Generate unified diff between two versions."""
     lines_v1 = content_v1.splitlines(keepends=True)
     lines_v2 = content_v2.splitlines(keepends=True)
-    
+
     diff = difflib.unified_diff(
         lines_v1,
         lines_v2,
@@ -1106,20 +1106,20 @@ def generate_diff(content_v1: str, content_v2: str) -> str:
         tofile=f'Version 2',
         lineterm=''
     )
-    
+
     return ''.join(diff)
 
 def generate_diff_with_stats(v1: str, v2: str) -> Dict[str, Any]:
     """Generate diff and statistics."""
     diff = generate_diff(v1, v2)
-    
+
     lines_added = diff.count('\n+') - diff.count('\n+++')
     lines_removed = diff.count('\n-') - diff.count('\n---')
-    
+
     # Similarity score using SequenceMatcher
     matcher = difflib.SequenceMatcher(None, v1, v2)
     similarity = matcher.ratio()
-    
+
     return {
         "diff": diff,
         "lines_added": lines_added,
@@ -1139,14 +1139,14 @@ def list_versions(
     limit: int = 20
 ) -> VersionListResponse:
     """List versions with pagination."""
-    
+
     # Validate
     assert page >= 1, "Page must be ≥1"
     assert 1 <= limit <= 100, "Limit must be 1-100"
-    
+
     # Calculate offset
     offset = (page - 1) * limit
-    
+
     # Query (with index on prompt_id, created_at)
     versions = db.query(PromptVersion) \
         .filter(PromptVersion.prompt_id == prompt_id) \
@@ -1154,12 +1154,12 @@ def list_versions(
         .offset(offset) \
         .limit(limit) \
         .all()
-    
+
     # Total count (cached if available)
     total = db.query(func.count(PromptVersion.id)) \
         .filter(PromptVersion.prompt_id == prompt_id) \
         .scalar()
-    
+
     # Response
     return VersionListResponse(
         versions=versions,
@@ -1244,10 +1244,10 @@ def test_create_version_on_prompt_update():
     """Updating a prompt creates new version."""
     prompt = create_prompt(PromptCreate(...))
     assert prompt.version_count == 1
-    
+
     updated = update_prompt(prompt.id, PromptUpdate(...))
     assert updated.version_count == 2
-    
+
     versions = list_versions(prompt.id)
     assert len(versions) == 2
 
@@ -1265,15 +1265,15 @@ def test_version_history_workflow():
     # Create
     prompt = client.post("/prompts", json={...}).json()
     assert prompt["version_count"] == 1
-    
+
     # Update
     updated = client.put(f"/prompts/{prompt['id']}", json={...}).json()
     assert updated["version_count"] == 2
-    
+
     # List versions
     versions = client.get(f"/prompts/{prompt['id']}/versions").json()
     assert versions["total"] == 2
-    
+
     # Restore
     restored = client.post(
         f"/prompts/{prompt['id']}/versions/{versions[1]['id']}/restore",
@@ -1389,8 +1389,8 @@ logger.warning(f"Failed to restore version: {version_id} (prompt deleted)")
 
 ---
 
-**Document Status**: ✅ Ready for Implementation  
-**Last Updated**: February 27, 2026  
+**Document Status**: ✅ Ready for Implementation
+**Last Updated**: February 27, 2026
 **Next Review Date**: March 6, 2026 (Post-implementation)
 
 ---
@@ -1400,9 +1400,9 @@ logger.warning(f"Failed to restore version: {version_id} (prompt deleted)")
 ### Query 1: Get Latest 10 Versions
 
 ```sql
-SELECT * FROM prompt_versions 
-WHERE prompt_id = ? 
-ORDER BY created_at DESC 
+SELECT * FROM prompt_versions
+WHERE prompt_id = ?
+ORDER BY created_at DESC
 LIMIT 10;
 
 -- Index usage: idx_prompt_versions_created
@@ -1411,16 +1411,16 @@ LIMIT 10;
 ### Query 2: Check if Prompt Has Versions
 
 ```sql
-SELECT COUNT(*) as version_count 
-FROM prompt_versions 
+SELECT COUNT(*) as version_count
+FROM prompt_versions
 WHERE prompt_id = ?;
 ```
 
 ### Query 3: Get Current Version
 
 ```sql
-SELECT * FROM prompt_versions 
-WHERE prompt_id = ? 
+SELECT * FROM prompt_versions
+WHERE prompt_id = ?
 AND is_current = TRUE;
 
 -- Index usage: idx_prompt_versions_current
@@ -1432,17 +1432,17 @@ AND is_current = TRUE;
 BEGIN TRANSACTION;
 
 -- Update old current version
-UPDATE prompt_versions 
-SET is_current = FALSE 
+UPDATE prompt_versions
+SET is_current = FALSE
 WHERE prompt_id = ? AND is_current = TRUE;
 
 -- Create new version (application layer)
 INSERT INTO prompt_versions (...) VALUES (...);
 
 -- Update prompt's current_version_id
-UPDATE prompts 
-SET current_version_id = ?, 
-    updated_at = NOW() 
+UPDATE prompts
+SET current_version_id = ?,
+    updated_at = NOW()
 WHERE id = ?;
 
 COMMIT;
@@ -1457,7 +1457,7 @@ COMMIT;
 def create_prompt(data: PromptCreate) -> Prompt:
     prompt = Prompt(id=uuid4(), **data.dict())
     storage.prompts[prompt.id] = prompt
-    
+
     # Create version 1 automatically
     version = PromptVersion(
         id=uuid4(),
@@ -1472,22 +1472,22 @@ def create_prompt(data: PromptCreate) -> Prompt:
     storage.prompt_versions[version.id] = version
     prompt.current_version_id = version.id
     prompt.version_count = 1
-    
+
     return prompt
 
 # 2. UPDATE PROMPT
 def update_prompt(prompt_id: str, data: PromptUpdate) -> Prompt:
     prompt = storage.prompts[prompt_id]
-    
+
     # Update prompt
     for field, value in data.dict(exclude_unset=True).items():
         setattr(prompt, field, value)
     prompt.updated_at = datetime.utcnow()
-    
+
     # Create new version
     old_version = storage.prompt_versions[prompt.current_version_id]
     old_version.is_current = False
-    
+
     new_version = PromptVersion(
         id=uuid4(),
         prompt_id=prompt.id,
@@ -1501,17 +1501,17 @@ def update_prompt(prompt_id: str, data: PromptUpdate) -> Prompt:
     storage.prompt_versions[new_version.id] = new_version
     prompt.current_version_id = new_version.id
     prompt.version_count += 1
-    
+
     return prompt
 
 # 3. RESTORE VERSION
 def restore_version(prompt_id: str, version_id: str, summary: str = None) -> Prompt:
     if not validate_restore(prompt_id, version_id):
         raise HTTPException(400, "Invalid restore")
-    
+
     # Load version to restore
     version_to_restore = storage.prompt_versions[version_id]
-    
+
     # Update prompt with version content
     prompt = storage.prompts[prompt_id]
     prompt.title = version_to_restore.title
@@ -1519,11 +1519,11 @@ def restore_version(prompt_id: str, version_id: str, summary: str = None) -> Pro
     prompt.description = version_to_restore.description
     prompt.collection_id = version_to_restore.collection_id
     prompt.updated_at = datetime.utcnow()
-    
+
     # Mark old current as not current
     old_version = storage.prompt_versions[prompt.current_version_id]
     old_version.is_current = False
-    
+
     # Create restore version
     new_version = PromptVersion(
         id=uuid4(),
@@ -1541,7 +1541,7 @@ def restore_version(prompt_id: str, version_id: str, summary: str = None) -> Pro
     storage.prompt_versions[new_version.id] = new_version
     prompt.current_version_id = new_version.id
     prompt.version_count += 1
-    
+
     return prompt
 ```
 

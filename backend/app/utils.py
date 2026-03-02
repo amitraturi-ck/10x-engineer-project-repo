@@ -58,8 +58,8 @@ def search_prompts(prompts: List[Prompt], query: str) -> List[Prompt]:
     """
     query_lower = query.lower()
     return [
-        p for p in prompts 
-        if query_lower in p.title.lower() or 
+        p for p in prompts
+        if query_lower in p.title.lower() or
            (p.description and query_lower in p.description.lower())
     ]
 

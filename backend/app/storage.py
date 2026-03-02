@@ -5,7 +5,7 @@ In a production environment, this would be replaced with a database.
 """
 
 from typing import Dict, List, Optional
-from app.models import Prompt, Collection
+from app.models import Prompt, Collection,PromptVersion
 
 
 class Storage:
@@ -26,9 +26,10 @@ class Storage:
         """Initialize empty in-memory stores for prompts and collections."""
         self._prompts: Dict[str, Prompt] = {}
         self._collections: Dict[str, Collection] = {}
-    
+        self._versions: Dict[str, List[PromptVersion]] = {}
+
     # ============== Prompt Operations ==============
-    
+
     def create_prompt(self, prompt: Prompt) -> Prompt:
         """Store a Prompt object and return it.
 
@@ -47,7 +48,7 @@ class Storage:
         """
         self._prompts[prompt.id] = prompt
         return prompt
-    
+
     def get_prompt(self, prompt_id: str) -> Optional[Prompt]:
         """Retrieve a prompt by its unique identifier.
 
@@ -62,7 +63,7 @@ class Storage:
             'Hi'
         """
         return self._prompts.get(prompt_id)
-    
+
     def get_all_prompts(self) -> List[Prompt]:
         """Return a list of all stored Prompt objects.
 
@@ -74,7 +75,7 @@ class Storage:
             1
         """
         return list(self._prompts.values())
-    
+
     def update_prompt(self, prompt_id: str, prompt: Prompt) -> Optional[Prompt]:
         """Update an existing prompt by id.
 
@@ -96,7 +97,28 @@ class Storage:
             return None
         self._prompts[prompt_id] = prompt
         return prompt
-    
+    # ============== Versioning Operations ==============
+
+    def add_version(self, prompt: Prompt) -> None:
+        """Save a snapshot of the prompt before it is modified."""
+        versions = self._versions.setdefault(prompt.id, [])
+
+        version = PromptVersion(
+            prompt_id=prompt.id,
+            version=len(versions) + 1,
+            title=prompt.title,
+            content=prompt.content,
+            description=prompt.description,
+            collection_id=prompt.collection_id,
+            created_at=prompt.created_at,
+        )
+
+        versions.append(version)
+
+    def get_versions(self, prompt_id: str) -> List[PromptVersion]:
+        """Return all saved versions for a prompt."""
+        return self._versions.get(prompt_id, [])
+
     def delete_prompt(self, prompt_id: str) -> bool:
         """Delete a prompt by id.
 
@@ -114,9 +136,9 @@ class Storage:
             del self._prompts[prompt_id]
             return True
         return False
-    
+
     # ============== Collection Operations ==============
-    
+
     def create_collection(self, collection: Collection) -> Collection:
         """Store a Collection object and return it.
 
@@ -135,7 +157,7 @@ class Storage:
         """
         self._collections[collection.id] = collection
         return collection
-    
+
     def get_collection(self, collection_id: str) -> Optional[Collection]:
         """Retrieve a collection by its unique identifier.
 
@@ -150,7 +172,7 @@ class Storage:
             'Default'
         """
         return self._collections.get(collection_id)
-    
+
     def get_all_collections(self) -> List[Collection]:
         """Return a list of all stored Collection objects.
 
@@ -162,7 +184,7 @@ class Storage:
             1
         """
         return list(self._collections.values())
-    
+
     def delete_collection(self, collection_id: str) -> bool:
         """Delete a collection by id.
 
@@ -180,7 +202,7 @@ class Storage:
             del self._collections[collection_id]
             return True
         return False
-    
+
     def get_prompts_by_collection(self, collection_id: str) -> List[Prompt]:
         """Return prompts that belong to a specific collection.
 
@@ -195,9 +217,9 @@ class Storage:
             [<Prompt ...>]
         """
         return [p for p in self._prompts.values() if p.collection_id == collection_id]
-    
+
     # ============== Utility ==============
-    
+
     def clear(self):
         """Remove all stored prompts and collections.
 
@@ -210,6 +232,7 @@ class Storage:
         """
         self._prompts.clear()
         self._collections.clear()
+        self._versions.clear()
 
 
 # Global storage instance

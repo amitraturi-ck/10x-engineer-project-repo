@@ -1,10 +1,10 @@
 # Feature Specification: Prompt Tagging & Classification System
 
-**Document Version**: 1.0  
-**Status**: Ready for Implementation (Week 3)  
-**Last Updated**: February 27, 2026  
-**Priority**: High  
-**Complexity**: Medium-High  
+**Document Version**: 1.0
+**Status**: Ready for Implementation (Week 3)
+**Last Updated**: February 27, 2026
+**Priority**: High
+**Complexity**: Medium-High
 
 ---
 
@@ -76,8 +76,8 @@ The Prompt Tagging System enables users to classify, organize, and discover prom
 
 ### Story 1: Create and Manage Tags
 
-**As a** prompt creator  
-**I want to** create custom tags for organizing prompts  
+**As a** prompt creator
+**I want to** create custom tags for organizing prompts
 **So that** I can categorize and classify my prompts flexibly
 
 #### Acceptance Criteria
@@ -126,8 +126,8 @@ Then the tag is immediately deleted
 
 ### Story 2: Tag Prompts with Multiple Tags
 
-**As a** prompt creator  
-**I want to** attach multiple tags to a prompt  
+**As a** prompt creator
+**I want to** attach multiple tags to a prompt
 **So that** I can classify prompts across multiple dimensions
 
 #### Acceptance Criteria
@@ -179,8 +179,8 @@ Then all tags are returned (no truncation)
 
 ### Story 3: Search and Filter Prompts by Tags
 
-**As a** prompt creator  
-**I want to** find prompts by filtering on tags  
+**As a** prompt creator
+**I want to** find prompts by filtering on tags
 **So that** I can discover relevant prompts quickly
 
 #### Acceptance Criteria
@@ -204,10 +204,10 @@ Then I receive prompts with ANY of the specified tags
 
 When I combine tag filters with other filters (collection, search)
 Then filters work together (AND logic)
-  Example: 
-    collection_id=col_123 
-    AND tags=python 
-    AND search="hello" 
+  Example:
+    collection_id=col_123
+    AND tags=python
+    AND search="hello"
     Returns prompts in collection col_123 with tag python containing "hello"
 
 When I search for tags with special characters or spaces
@@ -236,8 +236,8 @@ Then at least 100 prompts can be retrieved
 
 ### Story 4: Tag Autocomplete & Suggestions
 
-**As a** prompt creator  
-**I want to** get tag suggestions when typing  
+**As a** prompt creator
+**I want to** get tag suggestions when typing
 **So that** I can quickly find and apply existing tags
 
 #### Acceptance Criteria
@@ -289,8 +289,8 @@ Then suggestions exclude already-applied tags
 
 ### Story 5: Search Prompts with Text and Tag Filters
 
-**As a** prompt creator  
-**I want to** combine text search with tag filtering  
+**As a** prompt creator
+**I want to** combine text search with tag filtering
 **So that** I can narrow down results to exactly what I need
 
 #### Acceptance Criteria
@@ -308,7 +308,7 @@ Then:
     ✓ Multiple tags: AND by default, OR with pipe separator
     ✓ Collection filter: AND with text/tag filters
     ✓ Sorting: by relevance or date
-  Behavior: 
+  Behavior:
     GET /prompts?search=hello&tags=python,beginner&collection_id=col_123
     Returns: prompts in col_123 with "hello" AND (python AND beginner) tags
 
@@ -344,8 +344,8 @@ Then pagination is required
 
 ### Story 6: Tag Statistics & Analytics
 
-**As a** system administrator  
-**I want to** see tag usage statistics  
+**As a** system administrator
+**I want to** see tag usage statistics
 **So that** I can understand organization patterns and trends
 
 #### Acceptance Criteria
@@ -402,17 +402,17 @@ CREATE TABLE tags (
   id TEXT PRIMARY KEY,              -- UUID4
   name TEXT NOT NULL UNIQUE,        -- Case-insensitive unique
   name_normalized TEXT NOT NULL,    -- Lowercase for matching
-  
+
   -- Metadata
   description TEXT,                 -- Optional tag description
   color TEXT,                       -- Optional hex color (e.g., #FF5733)
-  
+
   -- Statistics
   usage_count INTEGER DEFAULT 0,    -- Number of prompts with tag
   created_at TIMESTAMP NOT NULL,    -- When tag was created
   updated_at TIMESTAMP,             -- Last modified
   last_used_at TIMESTAMP,           -- Last attached to prompt
-  
+
   -- Indexing
   INDEX idx_tags_name_normalized (name_normalized),
   INDEX idx_tags_usage_count (usage_count DESC),
@@ -429,14 +429,14 @@ CREATE TABLE prompt_tags (
   prompt_id TEXT NOT NULL,
   tag_id TEXT NOT NULL,
   PRIMARY KEY (prompt_id, tag_id),
-  
+
   -- Metadata
   created_at TIMESTAMP NOT NULL,    -- When tagged
-  
+
   -- Foreign Keys
   FOREIGN KEY (prompt_id) REFERENCES prompts(id) ON DELETE CASCADE,
   FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE,
-  
+
   -- Indexes
   INDEX idx_prompt_tags_tag_id (tag_id),
   INDEX idx_prompt_tags_created_at (created_at DESC)
@@ -462,7 +462,7 @@ CREATE TABLE tag_statistics (
   avg_rating DECIMAL(3,2),          -- Future feature
   trend_score DECIMAL(5,2),         -- Trending indicator
   updated_at TIMESTAMP,
-  
+
   FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 ```
@@ -476,20 +476,20 @@ class TagCreate(BaseModel):
     name: str
     description: Optional[str] = None
     color: Optional[str] = None
-    
+
     @validator('name')
     def validate_name(cls, v):
         # 1-50 chars, alphanumeric + hyphens
         if not re.match(r'^[a-zA-Z0-9\-]{1,50}$', v):
             raise ValueError('Tag name must be 1-50 alphanumeric characters and hyphens')
         return v.lower()
-    
+
     @validator('description')
     def validate_description(cls, v):
         if v and len(v) > 200:
             raise ValueError('Description must be ≤200 characters')
         return v
-    
+
     @validator('color')
     def validate_color(cls, v):
         if v and not re.match(r'^#[0-9A-Fa-f]{6}$', v):
@@ -578,7 +578,7 @@ class Storage:
         self.tags: Dict[str, Tag] = {}  # NEW: tag_id -> Tag
         self.prompt_tags: Dict[str, Set[str]] = {}  # NEW: prompt_id -> tag_ids
         self.tag_usage: Dict[str, int] = {}  # NEW: tag_id -> count
-        
+
 This structure enables:
 - O(1) tag lookup by ID
 - O(1) tag lookup by prompt
@@ -1323,13 +1323,13 @@ def parse_tag_filter(filter_string: str) -> Dict:
     """Parse tag filter syntax into logical groups."""
     # Split by pipe (OR operators)
     or_groups = filter_string.split('|')
-    
+
     # Each group is comma-separated (AND)
     groups = []
     for group in or_groups:
         and_tags = group.split(',')
         groups.append(and_tags)
-    
+
     # Example: "python,beginner|javascript" →
     # [[python, beginner], [javascript]]
     return {'or_groups': groups}
@@ -1338,17 +1338,17 @@ def filter_prompts_by_tags(prompts, tag_filter):
     """Apply tag filter to prompts."""
     groups = parse_tag_filter(tag_filter)
     result = []
-    
+
     for prompt in prompts:
         prompt_tags = get_prompt_tags(prompt.id)
-        
+
         # Check if prompt matches any OR group
         for and_group in groups['or_groups']:
             # All tags in AND group must be present
             if all(tag in prompt_tags for tag in and_group):
                 result.append(prompt)
                 break  # Match found, skip other groups
-    
+
     return result
 ```
 
@@ -1377,22 +1377,22 @@ def search_and_filter_prompts(
 ):
     """Combined search and tag filter."""
     results = storage.prompts.values()
-    
+
     # Step 1: Text search (if provided)
     if search_query:
         results = [p for p in results if matches_text_search(p, search_query)]
-    
+
     # Step 2: Tag filter (if provided)
     if tag_filter:
         results = filter_prompts_by_tags(results, tag_filter)
-    
+
     # Step 3: Collection filter (if provided)
     if collection_id:
         results = [p for p in results if p.collection_id == collection_id]
-    
+
     # Step 4: Sort
     results = sort_results(results, sort_by)
-    
+
     # Step 5: Paginate
     return paginate(results, page, limit)
 ```
@@ -1407,22 +1407,22 @@ def faceted_search(
     applied_filter: str,  # e.g., "python"
 ):
     """Return results + facets for navigation."""
-    
+
     results = search_and_filter_prompts(search_query, applied_filter)
-    
+
     # Calculate facet counts (for filtering UI)
     facets = {
         'tags': {},
         'collections': {},
         'date_ranges': {}
     }
-    
+
     # For each tag, count matches if added to current filter
     for tag in storage.tags.values():
         new_filter = f"{applied_filter},tag-{tag.id}"
         count = len(search_and_filter_prompts(search_query, new_filter))
         facets['tags'][tag.name] = count
-    
+
     return {
         'results': results,
         'facets': facets
@@ -1454,7 +1454,7 @@ CREATE FULLTEXT INDEX idx_tags_name ON tags(name, description);
 ```python
 # Use SQL JOIN instead of loop iterations
 # Pseudo-SQL for get_prompts_by_tag:
-SELECT p.* 
+SELECT p.*
 FROM prompts p
 INNER JOIN prompt_tags pt ON p.id = pt.prompt_id
 WHERE pt.tag_id = ?
@@ -1774,7 +1774,7 @@ def test_tag_name_validation():
     # Too long
     with pytest.raises(ValueError):
         create_tag(TagCreate(name="a" * 51))
-    
+
     # Special characters
     with pytest.raises(ValueError):
         create_tag(TagCreate(name="python++"))
@@ -1784,9 +1784,9 @@ def test_add_tag_to_prompt():
     """Adding tag to prompt increments usage."""
     tag = create_tag(TagCreate(name="python"))
     prompt = create_prompt(PromptCreate(...))
-    
+
     tag_prompt(prompt.id, tag.id)
-    
+
     updated_tag = get_tag(tag.id)
     assert updated_tag.usage_count == 1
 
@@ -1839,25 +1839,25 @@ def test_tag_workflow_end_to_end():
     # Create tags
     tag1 = client.post("/tags", json={"name": "python"}).json()
     tag2 = client.post("/tags", json={"name": "beginner"}).json()
-    
+
     # Create prompt
     prompt = client.post("/prompts", json={...}).json()
-    
+
     # Add tags
     client.post(f"/prompts/{prompt['id']}/tags/{tag1['id']}")
     client.post(f"/prompts/{prompt['id']}/tags/{tag2['id']}")
-    
+
     # Verify prompt has tags
     updated = client.get(f"/prompts/{prompt['id']}").json()
     assert len(updated['tags']) == 2
-    
+
     # Search by tag
     results = client.get("/prompts?tags=python").json()
     assert prompt['id'] in [p['id'] for p in results['prompts']]
-    
+
     # Delete tag
     client.delete(f"/tags/{tag1['id']}?confirm=true")
-    
+
     # Verify tag removed
     updated = client.get(f"/prompts/{prompt['id']}").json()
     assert len(updated['tags']) == 1
@@ -1970,8 +1970,8 @@ logger.error(f"Tag deletion failed: {tag_id} ({exc})")
 
 ---
 
-**Document Status**: ✅ Ready for Implementation  
-**Last Updated**: February 27, 2026  
+**Document Status**: ✅ Ready for Implementation
+**Last Updated**: February 27, 2026
 **Next Review Date**: March 6, 2026 (Post-implementation)
 
 ---
@@ -1981,7 +1981,7 @@ logger.error(f"Tag deletion failed: {tag_id} ({exc})")
 ### Query 1: Get Prompts with Tag (Most Common)
 
 ```sql
-SELECT DISTINCT p.* 
+SELECT DISTINCT p.*
 FROM prompts p
 INNER JOIN prompt_tags pt ON p.id = pt.prompt_id
 WHERE pt.tag_id = ?
@@ -1995,7 +1995,7 @@ LIMIT 20;
 ### Query 2: Get Prompts with ALL Tags (AND)
 
 ```sql
-SELECT p.* 
+SELECT p.*
 FROM prompts p
 WHERE 2 = (
   SELECT COUNT(DISTINCT pt.tag_id)
@@ -2007,7 +2007,7 @@ ORDER BY p.created_at DESC
 LIMIT 20;
 
 -- Alternative (cleaner):
-SELECT p.* 
+SELECT p.*
 FROM prompts p
 INNER JOIN prompt_tags pt ON p.id = pt.prompt_id
 WHERE pt.tag_id IN (?, ?)  -- Tag IDs
@@ -2020,7 +2020,7 @@ LIMIT 20;
 ### Query 3: Get Prompts with ANY TAG (OR)
 
 ```sql
-SELECT DISTINCT p.* 
+SELECT DISTINCT p.*
 FROM prompts p
 INNER JOIN prompt_tags pt ON p.id = pt.prompt_id
 WHERE pt.tag_id IN (?, ?)  -- Tag IDs
@@ -2086,7 +2086,7 @@ COMMIT;
 ### Query 7: Get Tags for a Specific Prompt
 
 ```sql
-SELECT t.* 
+SELECT t.*
 FROM tags t
 INNER JOIN prompt_tags pt ON t.id = pt.tag_id
 WHERE pt.prompt_id = ?
@@ -2096,7 +2096,7 @@ ORDER BY t.name ASC;
 ### Query 8: Tag Statistics (Most Used)
 
 ```sql
-SELECT 
+SELECT
   name,
   usage_count,
   created_at,
@@ -2118,12 +2118,12 @@ LIMIT 10;
 def create_tag(data: TagCreate) -> Tag:
     # Normalize name
     normalized_name = data.name.lower().strip()
-    
+
     # Check duplicate
     existing = storage.tags.get(normalized_name)
     if existing:
         raise HTTPException(409, "Tag name already exists")
-    
+
     # Create
     tag = Tag(
         id=uuid4(),
@@ -2134,38 +2134,38 @@ def create_tag(data: TagCreate) -> Tag:
         usage_count=0,
         created_at=datetime.utcnow()
     )
-    
+
     storage.tags[tag.id] = tag
     storage.tag_index_by_name[normalized_name] = tag.id
-    
+
     return tag
 
 # 2. ADD TAG TO PROMPT
 def tag_prompt(prompt_id: str, tag_id: str):
     prompt = storage.prompts[prompt_id]  # 404 if missing
     tag = storage.tags[tag_id]  # 404 if missing
-    
+
     # Check already tagged
     if tag_id in storage.prompt_tags.get(prompt_id, set()):
         raise HTTPException(409, "Prompt already has this tag")
-    
+
     # Check max tags
     if len(storage.prompt_tags.get(prompt_id, [])) >= 20:
         raise HTTPException(400, "Exceeded 20 tag limit")
-    
+
     # Add mapping
     if prompt_id not in storage.prompt_tags:
         storage.prompt_tags[prompt_id] = set()
     storage.prompt_tags[prompt_id].add(tag_id)
-    
+
     # Increment usage (atomic)
     tag.usage_count += 1
     tag.last_used_at = datetime.utcnow()
-    
+
     # Update prompt
     prompt.tag_count += 1
     prompt.updated_at = datetime.utcnow()
-    
+
     return prompt
 
 # 3. SEARCH PROMPTS BY TAGS
@@ -2176,12 +2176,12 @@ def search_prompts_by_tags(
     limit: int = 20
 ) -> List[Prompt]:
     """Filter prompts by tags."""
-    
+
     if not tag_filters:
         return []
-    
+
     results_per_tag = []
-    
+
     # Get prompts for each tag
     for tag_id in tag_filters:
         tag_prompts = [
@@ -2189,7 +2189,7 @@ def search_prompts_by_tags(
             if tag_id in tags
         ]
         results_per_tag.append(set(tag_prompts))
-    
+
     # Apply logic
     if logic == "AND":
         # Intersection: keep only prompts in all sets
@@ -2199,11 +2199,11 @@ def search_prompts_by_tags(
         result_ids = results_per_tag[0].union(*results_per_tag[1:])
     else:
         raise ValueError("Invalid logic")
-    
+
     # Convert to prompts and sort
     prompts = [storage.prompts[pid] for pid in result_ids]
     prompts.sort(key=lambda p: p.created_at, reverse=True)
-    
+
     # Paginate
     start = (page - 1) * limit
     return prompts[start:start + limit]
@@ -2215,40 +2215,40 @@ def autocomplete_tags(
     limit: int = 10
 ) -> List[Tag]:
     """Get tag suggestions for query."""
-    
+
     if not query or len(query) > 50:
         raise ValueError("Invalid query")
-    
+
     exclude_ids = exclude_ids or set()
     query_lower = query.lower()
-    
+
     # Find matches (prefix + substring)
     matches = []
     for tag in storage.tags.values():
         if tag.id in exclude_ids:
             continue
-        
+
         if tag.name_normalized.startswith(query_lower):
             matches.append((tag, 1))  # Prefix: priority 1
         elif query_lower in tag.name_normalized:
             matches.append((tag, 2))  # Substring: priority 2
-    
+
     # Sort by priority, then usage
     matches.sort(key=lambda x: (x[1], -x[0].usage_count))
-    
+
     # Return top results
     return [tag for tag, _ in matches[:limit]]
 
 # 5. DELETE TAG
 def delete_tag(tag_id: str, confirm: bool = False) -> Dict:
     tag = storage.tags[tag_id]
-    
+
     # Find prompts with this tag
     affected_prompts = [
         pid for pid, tags in storage.prompt_tags.items()
         if tag_id in tags
     ]
-    
+
     # Require confirmation if tag in use
     if affected_prompts and not confirm:
         raise HTTPException(
@@ -2256,16 +2256,16 @@ def delete_tag(tag_id: str, confirm: bool = False) -> Dict:
             f"Tag in use by {len(affected_prompts)} prompts. "
             "Add ?confirm=true to delete."
         )
-    
+
     # Remove from prompts
     for prompt_id in affected_prompts:
         storage.prompt_tags[prompt_id].remove(tag_id)
         storage.prompts[prompt_id].tag_count -= 1
-    
+
     # Delete tag
     del storage.tags[tag_id]
     del storage.tag_index_by_name[tag.name_normalized]
-    
+
     return {
         "success": True,
         "prompts_affected": len(affected_prompts)
@@ -2289,7 +2289,7 @@ def delete_tag(tag_id: str, confirm: bool = False) -> Dict:
         schema: { type: integer, default: 50 }
       - name: sort
         in: query
-        schema: 
+        schema:
           type: string
           enum: [usage_desc, usage_asc, name_asc, name_desc, date_desc]
           default: usage_desc
@@ -2299,7 +2299,7 @@ def delete_tag(tag_id: str, confirm: bool = False) -> Dict:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/TagListResponse' }
-  
+
   post:
     summary: Create tag
     requestBody:
@@ -2329,7 +2329,7 @@ def delete_tag(tag_id: str, confirm: bool = False) -> Dict:
         description: Tag details
       404:
         description: Tag not found
-  
+
   put:
     summary: Update tag
     parameters:
@@ -2344,7 +2344,7 @@ def delete_tag(tag_id: str, confirm: bool = False) -> Dict:
     responses:
       200:
         description: Tag updated
-  
+
   delete:
     summary: Delete tag
     parameters:
@@ -2378,7 +2378,7 @@ def delete_tag(tag_id: str, confirm: bool = False) -> Dict:
         description: Prompt or tag not found
       409:
         description: Tag already on prompt
-  
+
   delete:
     summary: Remove tag from prompt
     responses:
@@ -2456,12 +2456,12 @@ This specification documents the **Prompt Tagging & Classification System** with
 
 ### 🎯 **Key Features:**
 
-✅ Case-insensitive tag matching  
-✅ Multi-tag filtering (AND/OR logic)  
-✅ Real-time autocomplete  
-✅ Usage count tracking  
-✅ Search + tag combined queries  
-✅ Scalable to 1000+ tags  
-✅ Atomic operations  
+✅ Case-insensitive tag matching
+✅ Multi-tag filtering (AND/OR logic)
+✅ Real-time autocomplete
+✅ Usage count tracking
+✅ Search + tag combined queries
+✅ Scalable to 1000+ tags
+✅ Atomic operations
 
 **This specification is production-ready and can proceed to implementation immediately in Week 3!** 🚀

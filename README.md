@@ -98,7 +98,7 @@ curl -X GET "http://localhost:8000/prompts" -H "accept: application/json"
    - Ensure Python dependencies are managed with `requirements.txt`.
 
 2. **Frontend**:
-   - Planned for development using React and Vite in subsequent project phases. 
+   - Planned for development using React and Vite in subsequent project phases.
 
 3. **Testing**:
    - Run tests using `pytest` to ensure code quality and reliability.
@@ -119,5 +119,3 @@ We're excited to have a community of contributors who desire to build a robust a
 5. **Submit a Pull Request**: Open a pull request with a descriptive summary of your changes.
 
 For major changes, please open an issue first to discuss what you would like to change.
-
-
