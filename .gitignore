@@ -5,3 +5,122 @@ mutants/
 # Python cache
 __pycache__/
 *.pyc
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# ----------------------------
+# Node modules
+# ----------------------------
+node_modules/
+
+# ----------------------------
+# Logs
+# ----------------------------
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ----------------------------
+# Runtime data
+# ----------------------------
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ----------------------------
+# Dependency directories
+# ----------------------------
+jspm_packages/
+
+# ----------------------------
+# Environment variables
+# ----------------------------
+.env
+.env.*
+!.env.example
+
+# ----------------------------
+# Vite build output
+# ----------------------------
+dist/
+dist-ssr/
+
+# ----------------------------
+# Cache directories
+# ----------------------------
+.cache/
+.vite/
+.eslintcache
+.stylelintcache
+
+# ----------------------------
+# Editor directories and files
+# ----------------------------
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ----------------------------
+# TypeScript
+# ----------------------------
+*.tsbuildinfo
+
+# ----------------------------
+# Coverage
+# ----------------------------
+coverage/
+
+# ----------------------------
+# Tailwind
+# ----------------------------
+# (Tailwind doesn't generate special folders by default,
+# but keep postcss cache ignored)
+.postcss-cache/
+
+# ----------------------------
+# Testing
+# ----------------------------
+playwright-report/
+test-results/
+cypress/videos/
+cypress/screenshots/
+
+# ----------------------------
+# Optional (if using pnpm)
+# ----------------------------
+.pnpm-store/
+
+# ----------------------------
+# Mac / Linux system files
+# ----------------------------
+Thumbs.db
