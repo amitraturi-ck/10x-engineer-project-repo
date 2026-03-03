@@ -1,7 +1,7 @@
 """Pydantic models for PromptLab"""
 
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List,Dict, Any
 from pydantic import BaseModel, Field
 from uuid import uuid4
 
@@ -207,3 +207,9 @@ class PromptVersion(BaseModel):
 class PromptVersionList(BaseModel):
     prompt_id: str
     versions: List[PromptVersion]
+
+class PromptRunRequest(BaseModel):
+    variables: Optional[Dict[str, str]] = Field(default_factory=dict)
+
+class PromptRunResponse(BaseModel):
+    result: str

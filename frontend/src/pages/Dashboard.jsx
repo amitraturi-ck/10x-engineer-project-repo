@@ -24,107 +24,112 @@ export default function Dashboard() {
   const [error, setError] = useState(null)
 
   // ✅ Effect now owns the async logic (no external setState call)
-useEffect(() => {
-  let mounted = true
+  useEffect(() => {
+    let mounted = true
 
-  async function fetchData() {
-     try {
-    setError(null)
-    setLoading(true)
+    async function fetchData() {
+      try {
+        setError(null)
+        setLoading(true)
 
-    const data = await getPrompts({ collectionId })
+        const data = await getPrompts({ collectionId })
 
-    if (!mounted) return
+        if (!mounted) return
 
-    setPrompts(data.prompts)
-    } catch {
-    setError("Unable to load prompts. Please check your connection.")
-  } finally {
-    setLoading(false)
-  }
-  }
+        setPrompts(data.prompts)
+      } catch {
+        setError("Unable to load prompts. Please check your connection.")
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  fetchData()
-  return () => { mounted = false }
-}, [collectionId])
+    fetchData()
+    return () => { mounted = false }
+  }, [collectionId])
 
   const handleViewVersions = async (id) => {
-  const data = await getPromptVersions(id)
-  setVersions(data.versions)
-  setSelectedPromptId(id)
-  setShowModal(true)
-}
+    const data = await getPromptVersions(id)
+    setVersions(data.versions)
+    setSelectedPromptId(id)
+    setShowModal(true)
+  }
 
   const handleSearch = async (value) => {
-  const data = await getPrompts({ search: value, collectionId })
-  setPrompts(data.prompts)
-}
+    const data = await getPrompts({ search: value, collectionId })
+    setPrompts(data.prompts)
+  }
 
   const handleDelete = async (id) => {
-  if (!window.confirm("Delete this prompt?")) return
+    if (!window.confirm("Delete this prompt?")) return
 
-  await deletePrompt(id)
+    await deletePrompt(id)
 
-  // reload using SAME filters
-  const data = await getPrompts({ collectionId })
-  setPrompts(data.prompts)
-}
+    // reload using SAME filters
+    const data = await getPrompts({ collectionId })
+    setPrompts(data.prompts)
+  }
 
   const handleSelect = (id) => navigate(`/prompts/${id}`)
 
   if (loading) return <LoadingSpinner />
 
- return (
-  <div className="page">
+  return (
+    <div className="page">
 
-    <div className="page-header">
-      <h2>All Prompts</h2>
-      <SearchBar onChange={handleSearch} />
-    </div>
+      <div className="page-header">
+        <h2>All Prompts</h2>
+        <SearchBar onChange={handleSearch} />
+      </div>
 
-    {collectionId && (
-      <p className="filter-label">
-        Filtering by: <strong>{collectionName}</strong>
-      </p>
-    )}
+      {collectionId && (
+        <p className="filter-label">
+          Filtering by: <strong>{collectionName}</strong>
+        </p>
+      )}
 
-    {error && <div className="error-box">{error}</div>}
-
-    {/* ✅ THIS wrapper was missing */}
-    <div className="grid">
-      <PromptList
-        prompts={prompts}
-        onSelect={handleSelect}
-        onDelete={handleDelete}
-        onViewVersions={handleViewVersions}
-        onEdit={handleEdit}
-      />
-    </div>
-    <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-      <h3>Version History</h3>
-
-      {versions.length === 0 && <p>No previous versions</p>}
-
-      {versions.map(v => (
-        <div key={v.version} style={{ marginBottom: 15 }}>
-          <strong>Version {v.version}</strong>
-
-          <div>
-            <small>
-              Archived at: {new Date(v.archived_at).toLocaleString()}
-            </small>
-          </div>
-
-          <pre style={{ background: "#f5f5f5", padding: 10 }}>
-            {v.content}
-          </pre>
-
-          <hr />
+      {error && (
+        <div className="error-box">
+          <span>{error}</span>
+          <button className="close-error" onClick={() => setError(null)}>&times;</button>
         </div>
-      ))}
+      )}
 
-      <button onClick={() => setShowModal(false)}>Close</button>
-    </Modal>
+      {/* ✅ THIS wrapper was missing */}
+      <div className="grid">
+        <PromptList
+          prompts={prompts}
+          onSelect={handleSelect}
+          onDelete={handleDelete}
+          onViewVersions={handleViewVersions}
+          onEdit={handleEdit}
+        />
+      </div>
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <h3>Version History</h3>
+
+        {versions.length === 0 && <p>No previous versions</p>}
+
+        {versions.map(v => (
+          <div key={v.version} style={{ marginBottom: 15 }}>
+            <strong>Version {v.version}</strong>
+
+            <div>
+              <small>
+                Archived at: {new Date(v.archived_at).toLocaleString()}
+              </small>
+            </div>
+
+            <pre style={{ background: "#f5f5f5", padding: 10 }}>
+              {v.content}
+            </pre>
+
+            <hr />
+          </div>
+        ))}
+
+        <button onClick={() => setShowModal(false)}>Close</button>
+      </Modal>
     </div>
- )
+  )
 }

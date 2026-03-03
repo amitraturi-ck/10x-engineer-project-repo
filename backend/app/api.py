@@ -13,7 +13,9 @@ from app.models import (
 from app.storage import storage
 from app.utils import sort_prompts_by_date, filter_prompts_by_collection, search_prompts
 from app import __version__
-
+import re
+from app.models import PromptRunRequest, PromptRunResponse # Add these to imports
+from app.ai_service import run_prompt
 
 app = FastAPI(
     title="PromptLab API",
@@ -402,3 +404,30 @@ def delete_collection(collection_id: str):
     # Delete collection if it has no prompts
     storage.delete_collection(collection_id)
     return None
+
+@app.post("/prompts/{prompt_id}/run", response_model=PromptRunResponse)
+def execute_prompt(prompt_id: str, request_data: PromptRunRequest):
+    # 1. Fetch prompt from storage
+    if not prompt_id or not prompt_id.strip():
+        raise HTTPException(status_code=404, detail="Prompt not found")
+        
+    prompt = storage.get_prompt(prompt_id.strip())
+    if not prompt:
+        raise HTTPException(status_code=404, detail="Prompt not found")
+
+    # 2. Extract content
+    content = prompt.content
+    
+    # 3. Substitute template variables like {{name}}
+    if request_data.variables:
+        for key, value in request_data.variables.items():
+            pattern = r"\{\{\s*" + re.escape(key) + r"\s*\}\}"
+            content = re.sub(pattern, str(value), content)
+
+    # 4. Run the final parsed text through your AI service
+    try:
+        result_text = run_prompt(content)
+        return PromptRunResponse(result=result_text)
+    except RuntimeError as e:
+        # Catch the exception raised by ai_service.py
+        raise HTTPException(status_code=500, detail=str(e))
