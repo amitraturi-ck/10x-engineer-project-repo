@@ -11,6 +11,7 @@ export function ThemeProvider({ children }) {
     });
 
     useEffect(() => {
+          console.log("ThemeProvider mounted");
         const root = document.documentElement;
         if (isDark) {
             root.classList.add('dark');

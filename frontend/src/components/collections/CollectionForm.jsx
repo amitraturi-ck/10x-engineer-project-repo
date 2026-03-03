@@ -10,10 +10,34 @@ export default function CollectionForm({ onSubmit }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="form">
-      <input value={name} onChange={e => setName(e.target.value)} placeholder="Collection Name" required />
-      <input value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" />
-      <button type="submit">Create</button>
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-xl">
+
+      <div>
+        <input
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="Enter collection name"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm mb-2">
+          Description
+        </label>
+        <input
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          placeholder="Optional description"
+        />
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <button type="submit">
+          Create Collection
+        </button>
+      </div>
+
     </form>
   )
 }

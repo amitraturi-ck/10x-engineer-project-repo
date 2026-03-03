@@ -16,37 +16,47 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const collectionId = params.get("collection") || ""
-  const [collectionName, setCollectionName] = useState("")
+  const [collections, setCollections] = useState([])
+  const collectionName =collections.find(c => String(c.id) === String(collectionId))?.name || ""
   const [versions, setVersions] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [setSelectedPromptId] = useState(null)
   const handleEdit = (id) => navigate(`/prompts/${id}/edit`)
   const [error, setError] = useState(null)
 
-  // ✅ Effect now owns the async logic (no external setState call)
-  useEffect(() => {
-    let mounted = true
+useEffect(() => {
+  let mounted = true
 
-    async function fetchData() {
-      try {
-        setError(null)
-        setLoading(true)
+  async function loadData() {
+    try {
+      setError(null)
+      setLoading(true)
 
-        const data = await getPrompts({ collectionId })
+      const payload = collectionId ? { collectionId } : {}
 
-        if (!mounted) return
+      const [promptRes, collectionRes] = await Promise.all([
+        getPrompts(payload),
+        getCollections()
+      ])
 
-        setPrompts(data.prompts)
-      } catch {
+      if (!mounted) return
+
+      setPrompts(promptRes.prompts || [])
+      setCollections(collectionRes.collections || [])
+
+    } catch {
+      if (mounted)
         setError("Unable to load prompts. Please check your connection.")
-      } finally {
+    } finally {
+      if (mounted)
         setLoading(false)
-      }
     }
+  }
 
-    fetchData()
-    return () => { mounted = false }
-  }, [collectionId])
+  loadData()
+
+  return () => { mounted = false }
+}, [collectionId])
 
   const handleViewVersions = async (id) => {
     const data = await getPromptVersions(id)

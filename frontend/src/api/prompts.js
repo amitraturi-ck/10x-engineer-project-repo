@@ -37,3 +37,10 @@ export function deletePrompt(id) {
 export function getPromptVersions(id) {
   return request(`/prompts/${id}/versions`)
 }
+
+export function runPrompt(id, variables = {}) {
+  return request(`/prompts/${id}/run`, {
+    method: "POST",
+    body: JSON.stringify({ variables }),
+  })
+}

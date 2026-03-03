@@ -1,21 +1,26 @@
 export default function CollectionList({ collections, onDelete }) {
-  if (!collections?.length) return <p>No collections yet.</p>
+  if (!collections?.length) {
+    return <p className="empty-state">No collections yet</p>
+  }
 
   return (
-    <ul>
+    <div>
       {collections.map(c => (
-        <li key={c.id}>
-          {c.name}
+        <div key={c.id} className="collection-item-wrapper">
+          <button className="collection-item">
+            {c.name}
+          </button>
+
           {onDelete && (
             <button
+              className="danger small-btn"
               onClick={() => onDelete(c.id)}
-              style={{ marginLeft: 10 }}
             >
               Delete
             </button>
           )}
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   )
 }

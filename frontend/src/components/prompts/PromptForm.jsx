@@ -89,7 +89,7 @@ export default function PromptForm({ initialData = {}, onSubmit }) {
           value={form.title}
           onChange={handleChange}
           placeholder="Title"
-          className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          className="w-full"
         />
         {errors.title && (
           <p className="text-red-400 text-sm mt-1">{errors.title}</p>
@@ -103,7 +103,7 @@ export default function PromptForm({ initialData = {}, onSubmit }) {
           value={form.description}
           onChange={handleChange}
           placeholder="Description (optional)"
-          className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          className="w-full"
         />
         {errors.description && (
           <p className="text-red-400 text-sm mt-1">{errors.description}</p>
@@ -118,7 +118,7 @@ export default function PromptForm({ initialData = {}, onSubmit }) {
           onChange={handleChange}
           rows={8}
           placeholder="Write your prompt..."
-          className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          className="w-full"
         />
         {errors.content && (
           <p className="text-red-400 text-sm mt-1">{errors.content}</p>
@@ -131,7 +131,7 @@ export default function PromptForm({ initialData = {}, onSubmit }) {
           name="collection_id"
           value={form.collection_id || ""}
           onChange={handleChange}
-          className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          className="w-full"
         >
           <option value="">No Collection</option>
           {collections.map(c => (
@@ -143,10 +143,10 @@ export default function PromptForm({ initialData = {}, onSubmit }) {
       </div>
 
       {/* Submit */}
+
       <button
         type="submit"
         disabled={submitting}
-        className="px-4 py-2 bg-indigo-600 rounded hover:bg-indigo-500 disabled:opacity-50"
       >
         {submitting ? "Saving..." : "Save Prompt"}
       </button>

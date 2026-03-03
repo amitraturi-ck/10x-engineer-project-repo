@@ -410,14 +410,14 @@ def execute_prompt(prompt_id: str, request_data: PromptRunRequest):
     # 1. Fetch prompt from storage
     if not prompt_id or not prompt_id.strip():
         raise HTTPException(status_code=404, detail="Prompt not found")
-        
+
     prompt = storage.get_prompt(prompt_id.strip())
     if not prompt:
         raise HTTPException(status_code=404, detail="Prompt not found")
 
     # 2. Extract content
     content = prompt.content
-    
+
     # 3. Substitute template variables like {{name}}
     if request_data.variables:
         for key, value in request_data.variables.items():

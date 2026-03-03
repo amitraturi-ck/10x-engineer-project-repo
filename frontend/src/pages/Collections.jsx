@@ -29,17 +29,13 @@ export default function Collections() {
     setCollections(refreshed.collections)
   }
 
-  const handleDelete = async (id) => {
-    await deleteCollection(id)
-    const refreshed = await getCollections()
-    setCollections(refreshed.collections)
-  }
+
 
   return (
     <>
       <h2>Collections</h2>
       <CollectionForm onSubmit={handleCreate} />
-      <CollectionList collections={collections} onDelete={handleDelete} />
+
     </>
   )
 }
