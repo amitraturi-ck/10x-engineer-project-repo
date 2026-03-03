@@ -9,23 +9,18 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-    environment:
-      - PYTHONUNBUFFERED=1
-      # Prepared for future DB integration (bonus requirement)
-      - DATABASE_URL=postgresql://promptlab:promptlab@db:5432/promptlab
+    env_file:
+      - .env
     command: uvicorn app.api:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - db
 
-  # PostgreSQL service (Bonus: production-ready setup)
   db:
     image: postgres:15
     container_name: promptlab-db
-    restart: always
-    environment:
-      POSTGRES_USER: promptlab
-      POSTGRES_PASSWORD: promptlab
-      POSTGRES_DB: promptlab
+    restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:

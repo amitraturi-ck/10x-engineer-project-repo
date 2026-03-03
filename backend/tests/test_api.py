@@ -289,3 +289,111 @@ def test_create_prompt_special_characters(client):
         json={"title": "🚀🔥", "content": "Valid content here"}
     )
     assert response.status_code == 201
+
+
+def test_execute_prompt_success_no_variables(client, sample_prompt_data, monkeypatch):
+    # Create prompt
+    create = client.post("/prompts", json=sample_prompt_data)
+    prompt_id = create.json()["id"]
+
+    # Mock AI service
+    monkeypatch.setattr(
+        "app.api.run_prompt",
+        lambda content: f"AI: {content}"
+    )
+
+    response = client.post(
+        f"/prompts/{prompt_id}/run",
+        json={"variables": None}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["result"].startswith("AI:")
+
+def test_execute_prompt_with_variables(client, monkeypatch):
+    # Create prompt with template variable
+    prompt_data = {
+        "title": "Greeting",
+        "content": "Hello {{name}}"
+    }
+
+    create = client.post("/prompts", json=prompt_data)
+    prompt_id = create.json()["id"]
+
+    monkeypatch.setattr(
+        "app.api.run_prompt",
+        lambda content: content
+    )
+
+    response = client.post(
+        f"/prompts/{prompt_id}/run",
+        json={"variables": {"name": "Amit"}}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["result"] == "Hello Amit"
+
+def test_execute_prompt_direct_blank_id():
+    from app.api import execute_prompt
+    from app.models import PromptRunRequest
+    from fastapi import HTTPException
+
+    try:
+        execute_prompt("   ", PromptRunRequest(variables=None))
+    except HTTPException as e:
+        assert e.status_code == 404
+def test_execute_prompt_direct_not_found(monkeypatch):
+    from app.api import execute_prompt
+    from app.models import PromptRunRequest
+    from fastapi import HTTPException
+
+    # Force storage to return None
+    monkeypatch.setattr("app.api.storage.get_prompt", lambda _: None)
+
+    try:
+        execute_prompt("missing-id", PromptRunRequest(variables=None))
+    except HTTPException as e:
+        assert e.status_code == 404
+
+def test_execute_prompt_direct_runtime_error(monkeypatch):
+    from app.api import execute_prompt
+    from app.models import PromptRunRequest
+    from app.models import Prompt, get_current_time
+    from app.storage import storage
+    from fastapi import HTTPException
+
+    # Create real prompt
+    prompt = Prompt(
+        title="Test",
+        content="Hello",
+        description=None,
+        collection_id=None,
+        created_at=get_current_time(),
+        updated_at=get_current_time(),
+    )
+    storage.create_prompt(prompt)
+
+    # Force run_prompt to raise RuntimeError
+    def raise_error(_):
+        raise RuntimeError("AI failed")
+
+    monkeypatch.setattr("app.api.run_prompt", raise_error)
+
+    try:
+        execute_prompt(prompt.id, PromptRunRequest(variables=None))
+    except HTTPException as e:
+        assert e.status_code == 500
+        assert "AI failed" in str(e.detail)
+
+def test_get_collection_success(client: TestClient, sample_collection_data):
+    # Create collection
+    create = client.post("/collections", json=sample_collection_data)
+    collection_id = create.json()["id"]
+
+    # Fetch it
+    response = client.get(f"/collections/{collection_id}")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == collection_id
+    assert data["name"] == sample_collection_data["name"]

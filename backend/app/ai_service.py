@@ -1,16 +1,28 @@
 import os
+from typing import Optional
 from openai import OpenAI
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise ValueError("OPENAI_API_KEY environment variable is not set.")
 
-client = OpenAI(api_key=api_key)
 
-def run_prompt(prompt_text: str) -> str:
-    """Execute a prompt using OpenAI API."""
+def run_prompt(prompt_text: str, api_key: Optional[str] = None) -> str:
+    """
+    Execute a prompt using OpenAI API.
+
+    Priority for API key:
+    1. Explicit parameter
+    2. Environment variable (OPENAI_API_KEY)
+    """
+
+    # Priority 1: explicit param
+    final_api_key = api_key or os.getenv("OPENAI_API_KEY")
+
+    if not final_api_key:
+        raise RuntimeError("OPENAI_API_KEY is not configured.")
+
+    client = OpenAI(api_key=final_api_key)
+
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt_text},
